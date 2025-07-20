@@ -31,9 +31,15 @@
 
       <!-- Footer -->
       <div class="text-center mt-8">
-        <p class="text-sm text-gray-500">
+        <p class="text-sm text-gray-500 mb-2">
           Start your journaling journey today and discover the power of daily reflection.
         </p>
+        <div class="flex items-center justify-center space-x-2 text-xs text-gray-400">
+          <span>Developed by</span>
+          <span class="font-semibold text-blue-600">Chansocheat.Sok</span>
+          <span>•</span>
+          <span>© 2025</span>
+        </div>
       </div>
     </div>
   </div>

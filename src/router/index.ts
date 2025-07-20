@@ -9,7 +9,7 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
-      meta: { requiresAuth: true }
+      // Remove requiresAuth from home so it can handle both authenticated and non-authenticated states
     },
     {
       path: '/profile',
@@ -26,18 +26,29 @@ const router = createRouter({
   ],
 })
 
-// Navigation guard to protect routes
-router.beforeEach((to) => {
+// Navigation guard to protect routes that require authentication
+router.beforeEach(async (to) => {
   const authStore = useAuthStore()
   
-  // Allow access if route doesn't require auth or user is authenticated
-  if (!to.meta.requiresAuth || authStore.isAuthenticated) {
+  // Skip auth check for home route (it handles auth internally)
+  if (to.path === '/') {
     return true
   }
   
-  // User is not authenticated and route requires auth
-  // Redirect to home which will show auth forms
-  return '/'
+  // For other routes that require auth, check authentication
+  if (to.meta.requiresAuth) {
+    // Initialize auth if not done yet
+    if (authStore.loading) {
+      await authStore.initializeAuthListener()
+    }
+    
+    // If still not authenticated, redirect to home
+    if (!authStore.isAuthenticated) {
+      return '/'
+    }
+  }
+  
+  return true
 })
 
 export default router

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import {
   collection,
   addDoc,
@@ -22,6 +22,26 @@ export const useJournalStore = defineStore('journal', () => {
   const error = ref<string | null>(null)
   
   const authStore = useAuthStore()
+
+  // Watch for authentication changes and fetch entries automatically
+  watch(
+    () => ({ isAuthenticated: authStore.isAuthenticated, loading: authStore.loading }),
+    (authState, prevAuthState) => {
+      console.log('Auth state changed:', authState, 'Previous:', prevAuthState)
+      
+      if (authState.isAuthenticated && !authState.loading) {
+        // User is authenticated and auth loading is complete
+        console.log('User authenticated and ready, fetching entries...')
+        fetchEntries()
+      } else if (!authState.isAuthenticated && !authState.loading) {
+        // User logged out and auth loading is complete
+        console.log('User logged out, clearing entries...')
+        entries.value = []
+        error.value = null
+      }
+    },
+    { immediate: true, deep: true }
+  )
 
   // Computed properties
   const entriesByDate = computed(() => {
@@ -55,10 +75,12 @@ export const useJournalStore = defineStore('journal', () => {
   // Actions
   async function fetchEntries() {
     if (!authStore.user) {
+      console.log('No authenticated user, skipping fetch')
       entries.value = []
       return
     }
     
+    console.log('Fetching entries for user:', authStore.user.uid)
     loading.value = true
     error.value = null
 
@@ -79,12 +101,19 @@ export const useJournalStore = defineStore('journal', () => {
           updatedAt: doc.data().updatedAt?.toDate() || new Date(),
         }))
         .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()) as JournalEntry[]
+        
+      console.log('Fetched entries:', entries.value.length, 'entries')
     } catch (err) {
       error.value = `Failed to fetch entries: ${err instanceof Error ? err.message : 'Unknown error'}`
       console.error('Error fetching entries:', err)
     } finally {
       loading.value = false
     }
+  }
+
+  // Force refresh entries (useful for debugging or retry scenarios)
+  async function refreshEntries() {
+    await fetchEntries()
   }
 
   async function addEntry(entry: Omit<JournalEntry, 'id' | 'createdAt' | 'updatedAt' | 'userId'>) {
@@ -215,6 +244,7 @@ export const useJournalStore = defineStore('journal', () => {
 
     // Actions
     fetchEntries,
+    refreshEntries,
     addEntry,
     updateEntry,
     deleteEntry,

@@ -1,8 +1,29 @@
 <template>
   <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-6xl mx-auto">
+      <!-- Loading State -->
+      <div v-if="journalStore.loading" class="text-center py-16">
+        <LoadingSpinner />
+        <p class="mt-4 text-gray-600">Loading your journal entries...</p>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="journalStore.error" class="text-center py-16">
+        <div class="bg-red-50 border border-red-200 rounded-xl p-8 max-w-md mx-auto">
+          <div class="text-red-600 text-xl mb-2">📝</div>
+          <h3 class="text-lg font-semibold text-red-800 mb-2">Unable to load entries</h3>
+          <p class="text-red-700 mb-4">{{ journalStore.error }}</p>
+          <button 
+            @click="journalStore.refreshEntries"
+            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+
       <!-- Welcome Section -->
-      <div class="text-center mb-12">
+      <div v-else class="text-center mb-12">
         <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl shadow-lg mb-6">
           <span class="text-2xl">👋</span>
         </div>
@@ -16,7 +37,7 @@
 
       <!-- Quick Stats -->
       <div
-        v-if="journalStore.entries.length > 0"
+        v-if="journalStore.entries.length > 0 && !journalStore.loading"
         class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
       >
         <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300">
@@ -133,7 +154,7 @@
       </div>
 
       <!-- Entries List -->
-      <div v-else class="space-y-8">
+      <div v-else-if="!journalStore.loading && journalStore.entries.length > 0" class="space-y-8">
         <div class="flex items-center justify-between">
           <h3 class="text-2xl font-bold text-gray-900">Your Journal Entries</h3>
           <div class="text-sm text-gray-500">
@@ -161,23 +182,6 @@
             Load More Entries
           </button>
         </div>
-      </div>
-
-      <!-- Error State -->
-      <div v-if="journalStore.error" class="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
-        <div class="text-red-600 mb-3">
-          <svg class="w-8 h-8 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-          </svg>
-        </div>
-        <h4 class="font-semibold text-red-900 mb-2">Something went wrong</h4>
-        <p class="text-red-700 text-sm mb-4">{{ journalStore.error }}</p>
-        <button 
-          @click="journalStore.clearError" 
-          class="bg-red-100 hover:bg-red-200 text-red-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
-        >
-          Dismiss
-        </button>
       </div>
     </div>
 
@@ -215,6 +219,23 @@
         </div>
       </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="mt-16 py-8 border-t border-gray-200/50">
+      <div class="text-center">
+        <div class="flex items-center justify-center space-x-2 text-sm text-gray-500">
+          <span>Developed with</span>
+          <span class="text-red-500">❤️</span>
+          <span>by</span>
+          <span class="font-semibold text-blue-600">Chansocheat.Sok</span>
+          <span>•</span>
+          <span>© 2025 Daily Journal</span>
+        </div>
+        <p class="text-xs text-gray-400 mt-2">
+          Building tools for reflection and personal growth
+        </p>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -228,6 +249,7 @@ import type { JournalEntry } from '@/types/journal'
 import { EMOTION_OPTIONS } from '@/types/journal'
 import JournalEntryForm from '@/components/JournalEntryForm.vue'
 import JournalEntryCard from '@/components/JournalEntryCard.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const journalStore = useJournalStore()
 const authStore = useAuthStore()
@@ -329,7 +351,8 @@ async function searchByDate() {
 
 // Lifecycle
 onMounted(() => {
-  journalStore.fetchEntries()
+  // Journal entries will be fetched automatically when user is authenticated
+  // via the watcher in the journal store
 })
 </script>
 

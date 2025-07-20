@@ -135,9 +135,17 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Initialize auth state listener
   function initializeAuthListener() {
-    onAuthStateChanged(auth, (firebaseUser) => {
-      user.value = firebaseUser
-      loading.value = false
+    return new Promise<void>((resolve) => {
+      const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+        user.value = firebaseUser
+        loading.value = false
+        // Resolve the promise on the first auth state change
+        resolve()
+        // Don't unsubscribe, keep listening for auth changes
+      })
+      
+      // Store the unsubscribe function for cleanup if needed
+      return unsubscribe
     })
   }
 

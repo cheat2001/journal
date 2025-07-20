@@ -263,6 +263,16 @@ onMounted(() => {
           </button>
         </div>
       </div>
+
+      <!-- Footer -->
+      <div class="text-center mt-12 py-6">
+        <div class="flex items-center justify-center space-x-2 text-sm text-gray-500">
+          <span>Developed with</span>
+          <span class="text-red-500">❤️</span>
+          <span>by</span>
+          <span class="font-semibold text-blue-600">Chansocheat.Sok</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
