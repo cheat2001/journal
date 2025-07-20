@@ -129,6 +129,8 @@ export const useJournalStore = defineStore('journal', () => {
       const newEntry = {
         ...entry,
         userId: authStore.user.uid,
+        userDisplayName: authStore.userDisplayName,
+        userInitials: authStore.userDisplayName.split(' ').map(n => n[0]).join(''),
         createdAt: Timestamp.fromDate(now),
         updatedAt: Timestamp.fromDate(now),
       }
@@ -139,6 +141,8 @@ export const useJournalStore = defineStore('journal', () => {
       entries.value.unshift({
         id: docRef.id,
         userId: authStore.user.uid,
+        userDisplayName: authStore.userDisplayName,
+        userInitials: authStore.userDisplayName.split(' ').map(n => n[0]).join(''),
         ...entry,
         createdAt: now,
         updatedAt: now,

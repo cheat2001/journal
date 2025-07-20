@@ -23,6 +23,12 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue'),
       meta: { requiresAuth: true }
     },
+    {
+      path: '/feed',
+      name: 'social-feed',
+      component: () => import('../views/SocialFeedView.vue'),
+      meta: { requiresAuth: true }
+    },
   ],
 })
 

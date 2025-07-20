@@ -82,6 +82,50 @@
       ></textarea>
     </div>
 
+    <!-- Privacy Settings -->
+    <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-sm font-medium text-gray-900">Privacy Settings</h3>
+          <p class="text-sm text-gray-600 mt-1">
+            {{ form.isPublic ? 'This entry will be shared with the community' : 'This entry will remain private' }}
+          </p>
+        </div>
+        <button
+          type="button"
+          @click="form.isPublic = !form.isPublic"
+          :class="[
+            'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2',
+            form.isPublic ? 'bg-indigo-600' : 'bg-gray-200'
+          ]"
+        >
+          <span class="sr-only">Share publicly</span>
+          <span
+            :class="[
+              'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+              form.isPublic ? 'translate-x-5' : 'translate-x-0'
+            ]"
+          ></span>
+        </button>
+      </div>
+      
+      <div v-if="form.isPublic" class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-blue-700">
+              <strong>Public entries</strong> can be seen by other users and they can react or comment on them.
+              You can change this setting anytime.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Action Buttons -->
     <div class="flex gap-3 justify-end">
       <button type="button" @click="$emit('cancel')" class="btn-secondary" :disabled="loading">
@@ -139,6 +183,7 @@ const form = reactive({
   emotion: '',
   challenges: '',
   learning: '',
+  isPublic: false,
 })
 
 const isEditing = computed(() => !!props.entry?.id)
@@ -151,6 +196,7 @@ onMounted(() => {
       emotion: props.entry.emotion,
       challenges: props.entry.challenges,
       learning: props.entry.learning,
+      isPublic: props.entry.isPublic || false,
     })
   }
 })
