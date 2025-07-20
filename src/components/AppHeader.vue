@@ -40,14 +40,14 @@
               <p class="text-sm font-medium text-gray-900">{{ authStore.userDisplayName }}</p>
               <p class="text-xs text-gray-500 truncate">{{ authStore.user?.email }}</p>
             </div>
-            
-            <button
-              @click="showProfile = true; showUserMenu = false"
+
+            <router-link
+              to="/"
               class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 flex items-center transition-colors duration-150"
             >
               <UserIcon class="w-4 h-4 mr-3 text-gray-400" />
-              Quick Profile Edit
-            </button>
+              Journal Home
+            </router-link>
             
             <router-link
               to="/profile"
