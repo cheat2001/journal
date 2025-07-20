@@ -12,18 +12,13 @@ console.log('Raw Environment Variables:', {
   VITE_FIREBASE_APP_ID: import.meta.env.VITE_FIREBASE_APP_ID,
 })
 
-// Fallback to explicitly defined variables if import.meta.env fails
-const getEnvVar = (key: string, fallbackKey: string) => {
-  return import.meta.env[key] || (globalThis as Record<string, unknown>)[fallbackKey] || undefined
-}
-
 const firebaseConfig = {
-  apiKey: getEnvVar('VITE_FIREBASE_API_KEY', '__VITE_FIREBASE_API_KEY__'),
-  authDomain: getEnvVar('VITE_FIREBASE_AUTH_DOMAIN', '__VITE_FIREBASE_AUTH_DOMAIN__'),
-  projectId: getEnvVar('VITE_FIREBASE_PROJECT_ID', '__VITE_FIREBASE_PROJECT_ID__'),
-  storageBucket: getEnvVar('VITE_FIREBASE_STORAGE_BUCKET', '__VITE_FIREBASE_STORAGE_BUCKET__'),
-  messagingSenderId: getEnvVar('VITE_FIREBASE_MESSAGING_SENDER_ID', '__VITE_FIREBASE_MESSAGING_SENDER_ID__'),
-  appId: getEnvVar('VITE_FIREBASE_APP_ID', '__VITE_FIREBASE_APP_ID__'),
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 }
 
 // Debug: Log configuration to verify environment variables are loaded
