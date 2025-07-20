@@ -43,7 +43,7 @@
           </p>
           
           <!-- Social Links -->
-          <div class="flex items-center justify-center space-x-6 mt-8">
+          <div class="md:flex md:flex-row md:justify-center md:gap-3 flex-col gap-4">
             <a 
               href="https://github.com/cheat2001/" 
               target="_blank" 
