@@ -15,6 +15,7 @@ import { db } from '@/firebase'
 import type { JournalEntry } from '@/types/journal'
 import { format, parseISO, startOfDay, endOfDay } from 'date-fns'
 import { useAuthStore } from './auth'
+import { useGamificationStore } from './gamification'
 
 export const useJournalStore = defineStore('journal', () => {
   const entries = ref<JournalEntry[]>([])
@@ -121,6 +122,7 @@ export const useJournalStore = defineStore('journal', () => {
       throw new Error('User must be authenticated to add entries')
     }
     
+    const gamificationStore = useGamificationStore()
     loading.value = true
     error.value = null
 
@@ -147,6 +149,9 @@ export const useJournalStore = defineStore('journal', () => {
         createdAt: now,
         updatedAt: now,
       })
+
+      // Update gamification stats
+      await gamificationStore.updateStreak(entry.date)
     } catch (err) {
       error.value = `Failed to add entry: ${err instanceof Error ? err.message : 'Unknown error'}`
       console.error('Error adding entry:', err)

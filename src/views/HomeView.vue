@@ -63,6 +63,15 @@
         </div>
       </div>
 
+      <!-- Gamification Section -->
+      <div 
+        v-if="journalStore.entries.length > 0 && !journalStore.loading"
+        class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12"
+      >
+        <StreakWidget />
+        <AchievementWidget />
+      </div>
+
       <!-- Action Section -->
       <div class="mb-12">
         <div class="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 p-8 shadow-lg">
@@ -276,6 +285,9 @@
         </p>
       </div>
     </footer>
+
+    <!-- Badge Celebration Component -->
+    <BadgeCelebration />
   </div>
 </template>
 
@@ -285,14 +297,19 @@ import { format, subDays } from 'date-fns'
 import { PlusIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
 import { useJournalStore } from '@/stores/journal'
 import { useAuthStore } from '@/stores/auth'
+import { useGamificationStore } from '@/stores/gamification'
 import type { JournalEntry } from '@/types/journal'
 import { EMOTION_OPTIONS } from '@/types/journal'
 import JournalEntryForm from '@/components/JournalEntryForm.vue'
 import JournalEntryCard from '@/components/JournalEntryCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import StreakWidget from '@/components/StreakWidget.vue'
+import AchievementWidget from '@/components/AchievementWidget.vue'
+import BadgeCelebration from '@/components/BadgeCelebration.vue'
 
 const journalStore = useJournalStore()
 const authStore = useAuthStore()
+const gamificationStore = useGamificationStore()
 
 const showNewEntryForm = ref(false)
 const editingEntry = ref<JournalEntry | null>(null)
@@ -390,9 +407,14 @@ async function searchByDate() {
 }
 
 // Lifecycle
-onMounted(() => {
+onMounted(async () => {
   // Journal entries will be fetched automatically when user is authenticated
   // via the watcher in the journal store
+  
+  // Initialize gamification data
+  if (authStore.isAuthenticated) {
+    await gamificationStore.fetchUserStats()
+  }
 })
 </script>
 
