@@ -6,6 +6,9 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
+// Debug environment variables in production
+import './debug-env'
+
 // Developer attribution
 console.log(
   '%c🎨 Daily Journal %c- Developed by Chansocheat.Sok',
