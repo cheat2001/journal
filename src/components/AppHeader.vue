@@ -3,7 +3,7 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-20">
         <!-- Logo and Title -->
-        <div class="flex items-center space-x-3">
+        <router-link class="flex items-center space-x-3" to="/" aria-label="Daily Journal">
           <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
             <span class="text-xl">📖</span>
           </div>
@@ -13,7 +13,7 @@
             </h1>
             <p class="text-xs text-gray-500 hidden sm:block">Reflect & Grow</p>
           </div>
-        </div>
+        </router-link>
 
         <!-- User Menu -->
         <div class="relative" v-if="authStore.isAuthenticated">
