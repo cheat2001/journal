@@ -87,7 +87,7 @@
                   <input
                     v-model="searchDate"
                     type="date"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    class="form-input"
                     :max="today"
                     placeholder="Search by date"
                   />

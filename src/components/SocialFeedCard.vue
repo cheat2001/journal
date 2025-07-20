@@ -86,8 +86,8 @@
     </div>
 
     <!-- Actions Bar -->
-    <div class="px-6 py-3 bg-gray-50 border-t border-gray-100">
-      <div class="flex items-center justify-between">
+    <div class="px-6 py-3 bg-gray-50 border-t border-gray-10">
+      <div class="flex flex-col gap-4">
         <!-- Reaction Summary -->
         <div class="flex items-center space-x-4 text-sm text-gray-500">
           <span v-if="(entry.totalReactions || 0) > 0">
@@ -182,7 +182,7 @@
               v-model="newComment"
               placeholder="Write a comment..."
               rows="2"
-              class="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none"
+              class="form-textarea"
               @keydown.meta.enter="submitComment"
               @keydown.ctrl.enter="submitComment"
             ></textarea>
