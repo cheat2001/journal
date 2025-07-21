@@ -27,6 +27,10 @@
           <div class="story-avatar" :class="getMoodColor(story.emotion)">
             <span class="initials">{{ getInitials(story.userName) }}</span>
             <div class="mood-emoji">{{ story.emoji }}</div>
+            <!-- Reaction indicator -->
+            <div v-if="story.totalReactions && story.totalReactions > 0" class="reaction-indicator">
+              {{ story.totalReactions }}
+            </div>
           </div>
           <span class="story-label">{{ truncateName(story.userName) }}</span>
         </div>
@@ -118,6 +122,33 @@
               </p>
             </div>
           </div>
+          
+          <!-- Reactions Summary -->
+          <div v-if="viewingStory.reactions && viewingStory.reactions.length > 0" class="reactions-summary">
+            <h5>{{ viewingStory.totalReactions }} {{ viewingStory.totalReactions === 1 ? 'reaction' : 'reactions' }}</h5>
+            
+            <!-- Detailed Reactions List -->
+            <div class="reactions-list">
+              <div v-for="reaction in viewingStory.reactions" :key="reaction.id" class="reaction-item">
+                <div class="reaction-user">
+                  <div class="user-initials">{{ getInitials(reaction.userName) }}</div>
+                  <div class="reaction-details">
+                    <span class="user-name">{{ reaction.userName }}</span>
+                    <span class="reaction-type">{{ reaction.emoji }} {{ getReactionLabel(reaction.type) }}</span>
+                  </div>
+                  <span class="reaction-time">{{ formatTimeAgo(reaction.createdAt) }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Reaction Counts Summary -->
+            <div class="reaction-counts">
+              <div v-for="(count, type) in getReactionCounts(viewingStory)" :key="type" class="reaction-count">
+                <span class="count-emoji">{{ getReactionEmoji(String(type)) }}</span>
+                <span class="count-number">{{ count }}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="story-modal-footer">
@@ -126,8 +157,15 @@
             :key="reaction.value"
             @click="reactToStory(viewingStory, reaction)"
             class="reaction-btn"
+            :class="{ 
+              'loading': reactionLoading === reaction.value,
+              'user-reacted': hasUserReacted(viewingStory, reaction.value)
+            }"
+            :disabled="reactionLoading !== null"
           >
-            {{ reaction.emoji }} {{ reaction.label }}
+            <span v-if="reactionLoading === reaction.value" class="loading-spinner"></span>
+            <span v-else class="reaction-emoji">{{ reaction.emoji }}</span>
+            <span class="reaction-text">{{ reaction.label }}</span>
           </button>
         </div>
       </div>
@@ -141,7 +179,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { useMoodStore } from '@/stores/mood'
 import { useAuthStore } from '@/stores/auth'
 import { EMOTION_OPTIONS } from '@/types/journal'
-import type { MoodStory } from '@/types/journal'
+import type { MoodStory, MoodReaction } from '@/types/journal'
 
 const moodStore = useMoodStore()
 const authStore = useAuthStore()
@@ -153,6 +191,7 @@ const selectedEmotion = ref('')
 const customMessage = ref('')
 const isPublic = ref(true)
 const loading = ref(false)
+const reactionLoading = ref<string | null>(null) // Track which reaction is loading
 
 // Quick reactions
 const quickReactions = [
@@ -186,6 +225,29 @@ function getMoodColor(emotion: string): string {
   if (neutral.includes(emotion)) return 'mood-neutral'
   if (negative.includes(emotion)) return 'mood-negative'
   return 'mood-default'
+}
+
+function getReactionCounts(story: MoodStory) {
+  const counts: { [key: string]: number } = {}
+  story.reactions?.forEach(reaction => {
+    counts[reaction.type] = (counts[reaction.type] || 0) + 1
+  })
+  return counts
+}
+
+function getReactionEmoji(type: string): string {
+  const reaction = quickReactions.find(r => r.value === type)
+  return reaction?.emoji || '👍'
+}
+
+function getReactionLabel(type: string): string {
+  const reaction = quickReactions.find(r => r.value === type)
+  return reaction?.label || 'Like'
+}
+
+function hasUserReacted(story: MoodStory | null, reactionType: string): boolean {
+  if (!story || !authStore.user) return false
+  return story.reactions?.some(r => r.userId === authStore.user?.uid && r.type === reactionType) || false
 }
 
 // Modal functions
@@ -238,10 +300,66 @@ function closeStoryViewer() {
 async function reactToStory(story: MoodStory, reaction: typeof quickReactions[0]) {
   if (!story.id || story.userId === authStore.user?.uid) return
   
+  // Set loading state for this specific reaction
+  reactionLoading.value = reaction.value
+  
   try {
+    // Optimistic update - add reaction immediately to local state
+    const optimisticReaction: MoodReaction = {
+      id: 'temp-' + Date.now(),
+      userId: authStore.user?.uid || '',
+      userName: authStore.userDisplayName || 'You',
+      type: reaction.value,
+      emoji: reaction.emoji,
+      createdAt: new Date(),
+    }
+    
+    // Update the viewing story immediately for instant feedback
+    if (viewingStory.value && viewingStory.value.id === story.id) {
+      // Remove any existing reaction from this user first
+      const existingReactionIndex = viewingStory.value.reactions?.findIndex(
+        r => r.userId === authStore.user?.uid
+      ) || -1
+      
+      if (existingReactionIndex !== -1 && viewingStory.value.reactions) {
+        viewingStory.value.reactions.splice(existingReactionIndex, 1)
+      }
+      
+      // Add new reaction
+      viewingStory.value.reactions = [...(viewingStory.value.reactions || []), optimisticReaction]
+      viewingStory.value.totalReactions = viewingStory.value.reactions.length
+    }
+    
+    // Now make the actual API call
     await moodStore.reactToMoodStory(story.id, reaction.value, reaction.emoji)
+    
+    // Show success feedback
+    console.log(`✅ Reacted with ${reaction.emoji} ${reaction.label}`)
+    
+    // Refresh the viewing story with real data
+    if (viewingStory.value && viewingStory.value.id === story.id) {
+      const updatedStory = moodStore.publicMoodStories.find(s => s.id === story.id)
+      if (updatedStory) {
+        viewingStory.value = updatedStory
+      }
+    }
+    
   } catch (error) {
-    console.error('Failed to react:', error)
+    console.error('❌ Failed to react:', error)
+    
+    // Revert optimistic update on error
+    if (viewingStory.value && viewingStory.value.id === story.id) {
+      const tempReactionIndex = viewingStory.value.reactions?.findIndex(
+        r => r.id.startsWith('temp-')
+      ) || -1
+      
+      if (tempReactionIndex !== -1 && viewingStory.value.reactions) {
+        viewingStory.value.reactions.splice(tempReactionIndex, 1)
+        viewingStory.value.totalReactions = viewingStory.value.reactions.length
+      }
+    }
+  } finally {
+    reactionLoading.value = null
   }
 }
 
@@ -383,6 +501,24 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   font-size: 14px;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.reaction-indicator {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
   border: 2px solid white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -680,6 +816,106 @@ onMounted(() => {
   margin-top: 8px;
 }
 
+/* Reactions Summary */
+.reactions-summary {
+  margin-top: 24px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.reactions-summary h5 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+  margin: 0 0 12px 0;
+}
+
+.reactions-list {
+  margin-bottom: 16px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.reaction-item {
+  margin-bottom: 8px;
+}
+
+.reaction-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.user-initials {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.reaction-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.reaction-type {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.reaction-time {
+  font-size: 11px;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.reaction-counts {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.reaction-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 16px;
+  font-size: 12px;
+}
+
+.count-emoji {
+  font-size: 14px;
+}
+
+.count-number {
+  font-weight: 600;
+  color: #374151;
+}
+
 .story-modal-footer {
   display: flex;
   gap: 8px;
@@ -690,19 +926,73 @@ onMounted(() => {
 
 .reaction-btn {
   flex: 1;
-  padding: 8px 12px;
-  background: white;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
-  color:black;
+  transition: all 0.3s ease;
+  color: #334155;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .reaction-btn:hover {
-  background: #f3f4f6;
-  border-color: #9ca3af;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  border-color: #64748b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: #1e293b;
+}
+
+.reaction-btn.loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.reaction-btn.user-reacted {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  border-color: #3b82f6;
+  color: #1e40af;
+}
+
+.reaction-btn.user-reacted:hover {
+  background: linear-gradient(135deg, #bfdbfe, #93c5fd);
+  border-color: #2563eb;
+}
+
+.reaction-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e2e8f0;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.reaction-emoji {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.reaction-text {
+  font-size: 13px;
+  font-weight: 600;
 }
 </style>

@@ -191,25 +191,80 @@ export const useMoodStore = defineStore('mood', () => {
           ...data,
           createdAt: safeToDate(data.createdAt),
           updatedAt: safeToDate(data.updatedAt),
+          reactions: [], // Initialize empty reactions array
+          totalReactions: 0, // Initialize total reactions
         }
       }) as MoodStory[]
-      
+
+      // Fetch reactions for all stories
+      await fetchReactionsForStories(stories)
+
       // Sort manually by creation time (newest first)
       stories.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-      
+
       // Merge with existing stories, avoiding duplicates
       const existingIds = new Set(moodStories.value.map(story => story.id))
       const newStories = stories.filter(story => !existingIds.has(story.id))
-      
+
       moodStories.value = [...newStories, ...moodStories.value]
         .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-      
+
       console.log('Fetched public mood stories:', stories.length)
     } catch (err) {
       error.value = `Failed to fetch mood stories: ${err instanceof Error ? err.message : 'Unknown error'}`
       console.error('Error fetching mood stories:', err)
     } finally {
       loading.value = false
+    }
+  }
+  
+  // Helper function to fetch reactions for multiple stories
+  async function fetchReactionsForStories(stories: MoodStory[]) {
+    try {
+      const storyIds = stories.map(story => story.id).filter(Boolean)
+      if (storyIds.length === 0) return
+
+      // Fetch all reactions for these stories
+      const reactionsQuery = query(
+        collection(db, 'mood-reactions'),
+        where('moodStoryId', 'in', storyIds)
+      )
+      
+      const reactionsSnapshot = await getDocs(reactionsQuery)
+      
+      // Group reactions by story ID
+      const reactionsByStory: { [storyId: string]: MoodReaction[] } = {}
+      
+      reactionsSnapshot.docs.forEach(doc => {
+        const data = doc.data()
+        const reaction: MoodReaction = {
+          id: doc.id,
+          userId: data.userId,
+          userName: data.userName,
+          type: data.type,
+          emoji: data.emoji,
+          createdAt: safeToDate(data.createdAt),
+        }
+        
+        const storyId = data.moodStoryId
+        if (!reactionsByStory[storyId]) {
+          reactionsByStory[storyId] = []
+        }
+        reactionsByStory[storyId].push(reaction)
+      })
+      
+      // Update stories with their reactions
+      stories.forEach(story => {
+        if (story.id) {
+          const reactions = reactionsByStory[story.id] || []
+          story.reactions = reactions
+          story.totalReactions = reactions.length
+        }
+      })
+      
+      console.log('Fetched reactions for stories:', Object.keys(reactionsByStory).length)
+    } catch (err) {
+      console.error('Error fetching reactions:', err)
     }
   }
   
@@ -228,9 +283,14 @@ export const useMoodStore = defineStore('mood', () => {
       const existingReaction = story.reactions?.find(r => r.userId === authStore.user?.uid)
       
       if (existingReaction) {
-        // Update existing reaction
-        // For simplicity, we'll remove and add new reaction
-        await removeReactionFromMood(moodId, existingReaction.id)
+        // If user clicked the same reaction, remove it (toggle off)
+        if (existingReaction.type === reactionType) {
+          await removeReactionFromMood(moodId, existingReaction.id)
+          return
+        } else {
+          // Update existing reaction to new type
+          await removeReactionFromMood(moodId, existingReaction.id)
+        }
       }
       
       // Add new reaction
@@ -253,19 +313,25 @@ export const useMoodStore = defineStore('mood', () => {
         createdAt: safeToDate(reactionData.createdAt),
       }
       
-      // Update local state
+      // Update local state immediately
       const storyIndex = moodStories.value.findIndex(s => s.id === moodId)
       if (storyIndex !== -1) {
         const updatedStory = { ...moodStories.value[storyIndex] }
-        updatedStory.reactions = [...(updatedStory.reactions || []), newReaction]
+        
+        // Remove any temporary reactions first
+        updatedStory.reactions = (updatedStory.reactions || []).filter(r => !r.id.startsWith('temp-'))
+        
+        // Add the new reaction
+        updatedStory.reactions = [...updatedStory.reactions, newReaction]
         updatedStory.totalReactions = updatedStory.reactions.length
         moodStories.value[storyIndex] = updatedStory
       }
       
-      console.log('Reaction added:', reactionType)
+      console.log('✅ Reaction added successfully:', reactionType)
     } catch (err) {
       error.value = `Failed to react: ${err instanceof Error ? err.message : 'Unknown error'}`
-      console.error('Error reacting to mood:', err)
+      console.error('❌ Error reacting to mood:', err)
+      throw err // Re-throw to handle in component
     }
   }
   
@@ -313,6 +379,45 @@ export const useMoodStore = defineStore('mood', () => {
     ])
   }
   
+  // Refresh reactions for a specific story (for real-time sync)
+  async function refreshStoryReactions(storyId: string) {
+    try {
+      const reactionsQuery = query(
+        collection(db, 'mood-reactions'),
+        where('moodStoryId', '==', storyId)
+      )
+      
+      const reactionsSnapshot = await getDocs(reactionsQuery)
+      const reactions: MoodReaction[] = []
+      
+      reactionsSnapshot.docs.forEach(doc => {
+        const data = doc.data()
+        reactions.push({
+          id: doc.id,
+          userId: data.userId,
+          userName: data.userName,
+          type: data.type,
+          emoji: data.emoji,
+          createdAt: safeToDate(data.createdAt),
+        })
+      })
+      
+      // Update the story in local state
+      const storyIndex = moodStories.value.findIndex(s => s.id === storyId)
+      if (storyIndex !== -1) {
+        const updatedStory = { ...moodStories.value[storyIndex] }
+        updatedStory.reactions = reactions
+        updatedStory.totalReactions = reactions.length
+        moodStories.value[storyIndex] = updatedStory
+      }
+      
+      return reactions
+    } catch (err) {
+      console.error('Error refreshing story reactions:', err)
+      return []
+    }
+  }
+  
   return {
     // State
     moodStories,
@@ -332,5 +437,6 @@ export const useMoodStore = defineStore('mood', () => {
     removeReactionFromMood,
     deleteTodaysMood,
     refreshMoodData,
+    refreshStoryReactions,
   }
 })
