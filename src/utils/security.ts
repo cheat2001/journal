@@ -69,7 +69,10 @@ export class SecurityValidator {
     }
     
     // Emotion validation
-    const validEmotions = ['😊', '😔', '😴', '🤔', '😤', '❤️', '🌟']
+    const validEmotions = [
+      'happy', 'excited', 'calm', 'grateful', 'content', 'neutral',
+      'tired', 'stressed', 'anxious', 'sad', 'frustrated', 'overwhelmed'
+    ]
     if (typeof entry.emotion === 'string' && !validEmotions.includes(entry.emotion)) {
       errors.push('Invalid emotion selected')
     }
