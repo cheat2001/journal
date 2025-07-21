@@ -10,6 +10,11 @@
 
     <!-- Main Content -->
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <!-- Mood Stories Section -->
+      <div class="mb-8">
+        <MoodStoriesHeader />
+      </div>
+
       <!-- Loading State -->
       <div v-if="socialStore.loading" class="flex justify-center items-center py-12 text-black">
         <LoadingSpinner />
@@ -128,6 +133,7 @@ import { onMounted } from 'vue'
 import { useSocialStore } from '@/stores/social'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SocialFeedCard from '@/components/SocialFeedCard.vue'
+import MoodStoriesHeader from '@/components/MoodStoriesHeader.vue'
 
 const socialStore = useSocialStore()
 

@@ -1,34 +1,68 @@
 <template>
-  <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-40 shadow-sm">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+  <header class="bg-white/90 backdrop-blur-lg border-b border-gray-200/50 sticky top-0 z-40 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-20">
         <!-- Logo and Title -->
-        <router-link class="flex items-center space-x-3" to="/" aria-label="Daily Journal">
-          <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-            <span class="text-xl">📖</span>
+        <router-link class="flex items-center space-x-3 group" to="/" aria-label="Daily Journal">
+          <div class="w-12 h-12 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-105">
+            <span class="text-2xl">📖</span>
           </div>
           <div>
-            <h1 class="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+            <h1 class="text-xl font-bold bg-gradient-to-r from-gray-900 via-purple-800 to-blue-800 bg-clip-text text-transparent">
               Daily Journal
             </h1>
-            <p class="text-xs text-gray-500 hidden sm:block">Reflect & Grow</p>
+            <p class="text-xs text-gray-500 hidden sm:block font-medium">Reflect, Share & Grow</p>
           </div>
         </router-link>
+
+        <!-- Navigation -->
+        <nav class="hidden md:flex items-center space-x-2">
+          <router-link
+            to="/"
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200"
+            :class="$route.path === '/' 
+              ? 'bg-blue-100 text-blue-700 shadow-sm' 
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+          >
+            <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2m-6 4h4"></path>
+            </svg>
+            Journal
+          </router-link>
+          
+          <router-link
+            to="/feed"
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200"
+            :class="$route.path === '/feed' 
+              ? 'bg-purple-100 text-purple-700 shadow-sm' 
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+          >
+            <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            Community
+          </router-link>
+        </nav>
 
         <!-- User Menu -->
         <div class="relative" v-if="authStore.isAuthenticated">
           <button
             @click="showUserMenu = !showUserMenu"
-            class="flex items-center space-x-3 text-gray-700 hover:text-gray-900 focus:outline-none group transition-all duration-200"
+            class="flex items-center space-x-3 text-gray-700 hover:text-gray-900 focus:outline-none group transition-all duration-200 p-2 rounded-xl hover:bg-gray-50"
           >
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg group-hover:shadow-xl transition-all duration-200">
-              {{ userInitials }}
+            <div class="relative">
+              <div class="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg group-hover:shadow-xl transition-all duration-200 group-hover:scale-105">
+                {{ userInitials }}
+              </div>
+              <!-- Online indicator -->
+              <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
             </div>
             <div class="hidden sm:block text-left">
               <div class="text-sm font-semibold text-gray-900">{{ authStore.userDisplayName }}</div>
               <div class="text-xs text-gray-500">{{ authStore.user?.email }}</div>
             </div>
-            <ChevronDownIcon class="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors duration-200" />
+            <ChevronDownIcon class="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-all duration-200" :class="showUserMenu ? 'rotate-180' : ''" />
           </button>
 
           <!-- Dropdown Menu -->

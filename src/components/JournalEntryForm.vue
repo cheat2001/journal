@@ -1,222 +1,532 @@
 <template>
-  <form @submit.prevent="handleSubmit" class="card max-w-2xl mx-auto">
-    <h2 class="text-2xl font-bold text-gray-900 mb-6">
-      {{ isEditing ? 'Edit' : 'New' }} Journal Entry
-    </h2>
-
-    <!-- Date Field -->
-    <div class="mb-6">
-      <label for="date" class="block text-sm font-medium text-gray-700 mb-2"> Date </label>
-      <input id="date" v-model="form.date" type="date" :max="today" class="form-input" required />
-    </div>
-
-    <!-- Gratitude Field -->
-    <div class="mb-6">
-      <label for="gratitude" class="block text-sm font-medium text-gray-700 mb-2">
-        What are you grateful for today?
-      </label>
-      <textarea
-        id="gratitude"
-        v-model="form.gratitude"
-        rows="3"
-        placeholder="I'm grateful for..."
-        class="form-textarea"
-        required
-      ></textarea>
-    </div>
-
-    <!-- Emotion Field -->
-    <div class="mb-6">
-      <label class="block text-sm font-medium text-gray-700 mb-2"> How are you feeling? </label>
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-        <button
-          v-for="emotion in EMOTION_OPTIONS"
-          :key="emotion.value"
-          type="button"
-          @click="form.emotion = emotion.value"
-          :class="[
-            'p-3 rounded-lg border text-center transition-all duration-200',
-            form.emotion === emotion.value
-              ? 'border-blue-500 bg-blue-50 text-blue-700'
-              : 'border-gray-300 hover:border-gray-400',
-          ]"
-        >
-          <div class="text-2xl mb-1">{{ emotion.emoji }}</div>
-          <div class="text-sm font-medium">{{ emotion.label }}</div>
-        </button>
+  <div class="journal-form-container">
+    <form @submit.prevent="handleSubmit" class="journal-form">
+      <div class="form-header">
+        <h2 class="form-title">
+          {{ isEditing ? 'Edit' : 'New' }} Journal Entry
+        </h2>
+        <p class="form-subtitle">Reflect on your day and capture your thoughts</p>
       </div>
-      <input
-        v-if="form.emotion && !EMOTION_OPTIONS.find((e) => e.value === form.emotion)"
-        v-model="form.emotion"
-        type="text"
-        placeholder="Custom emotion"
-        class="form-input mt-3"
-      />
-    </div>
 
-    <!-- Challenges Field -->
-    <div class="mb-6">
-      <label for="challenges" class="block text-sm font-medium text-gray-700 mb-2">
-        What challenges did you face?
-      </label>
-      <textarea
-        id="challenges"
-        v-model="form.challenges"
-        rows="3"
-        placeholder="Today's challenges..."
-        class="form-textarea"
-      ></textarea>
-    </div>
-
-    <!-- Learning Field -->
-    <div class="mb-6">
-      <label for="learning" class="block text-sm font-medium text-gray-700 mb-2">
-        What did you learn today?
-      </label>
-      <textarea
-        id="learning"
-        v-model="form.learning"
-        rows="3"
-        placeholder="I learned that..."
-        class="form-textarea"
-      ></textarea>
-    </div>
-
-    <!-- Privacy Settings -->
-    <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-      <div class="flex items-center justify-between">
-        <div>
-          <h3 class="text-sm font-medium text-gray-900">Privacy Settings</h3>
-          <p class="text-sm text-gray-600 mt-1">
-            {{ form.isPublic ? 'This entry will be shared with the community' : 'This entry will remain private' }}
-          </p>
-        </div>
-        <button
-          type="button"
-          @click="form.isPublic = !form.isPublic"
-          :class="[
-            'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2',
-            form.isPublic ? 'bg-indigo-600' : 'bg-gray-200'
-          ]"
-        >
-          <span class="sr-only">Share publicly</span>
-          <span
-            :class="[
-              'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
-              form.isPublic ? 'translate-x-5' : 'translate-x-0'
-            ]"
-          ></span>
-        </button>
+      <!-- Date Field -->
+      <div class="form-group">
+        <label for="date" class="form-label">Date</label>
+        <input 
+          id="date" 
+          v-model="form.date" 
+          type="date" 
+          :max="today" 
+          class="form-input" 
+          required 
+        />
       </div>
-      
-      <div v-if="form.isPublic" class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <p class="text-sm text-blue-700">
-              <strong>Public entries</strong> can be seen by other users and they can react or comment on them.
-              You can change this setting anytime.
-            </p>
-          </div>
+
+      <!-- Gratitude Field -->
+      <div class="form-group">
+        <label for="gratitude" class="form-label">
+          What are you grateful for today?
+        </label>
+        <textarea
+          id="gratitude"
+          v-model="form.gratitude"
+          rows="3"
+          placeholder="I'm grateful for..."
+          class="form-textarea"
+          required
+        ></textarea>
+      </div>
+
+      <!-- Emotion Field -->
+      <div class="form-group">
+        <label class="form-label">How are you feeling?</label>
+        <div class="emotions-grid">
+          <button
+            v-for="emotion in EMOTION_OPTIONS"
+            :key="emotion.value"
+            type="button"
+            @click="form.emotion = emotion.value"
+            class="emotion-card"
+            :class="{ active: form.emotion === emotion.value }"
+          >
+            <span class="emotion-emoji">{{ emotion.emoji }}</span>
+            <span class="emotion-label">{{ emotion.label }}</span>
+          </button>
         </div>
       </div>
-    </div>
 
-    <!-- Action Buttons -->
-    <div class="flex gap-3 justify-end">
-      <button type="button" @click="$emit('cancel')" class="btn-secondary" :disabled="loading">
-        Cancel
-      </button>
-      <button
-        type="submit"
-        class="btn-primary"
-        :disabled="loading || !form.gratitude.trim() || !form.emotion"
-      >
-        <LoadingSpinner v-if="loading" class="w-4 h-4 mr-2" />
-        {{ isEditing ? 'Update Entry' : 'Save Entry' }}
-      </button>
-    </div>
+      <!-- Challenges Field -->
+      <div class="form-group">
+        <label for="challenges" class="form-label">
+          What challenges did you face today?
+        </label>
+        <textarea
+          id="challenges"
+          v-model="form.challenges"
+          rows="4"
+          placeholder="Describe any challenges, obstacles, or difficult moments you experienced today..."
+          class="form-textarea"
+          required
+        ></textarea>
+      </div>
 
-    <!-- Error Message -->
-    <div
-      v-if="error"
-      class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
-    >
-      {{ error }}
-    </div>
-  </form>
+      <!-- Learning Field -->
+      <div class="form-group">
+        <label for="learning" class="form-label">
+          What did you learn or discover?
+        </label>
+        <textarea
+          id="learning"
+          v-model="form.learning"
+          rows="4"
+          placeholder="Share any insights, lessons learned, or discoveries from your day..."
+          class="form-textarea"
+          required
+        ></textarea>
+      </div>
+
+      <!-- Privacy & Mood Section -->
+      <div class="form-section">
+        <h3 class="section-title">Privacy & Sharing</h3>
+        
+        <div class="privacy-options">
+          <label class="checkbox-option">
+            <input 
+              type="checkbox" 
+              v-model="form.isPublic" 
+              class="form-checkbox"
+            />
+            <span class="checkbox-label">
+              Make this entry public in community feed
+            </span>
+          </label>
+        </div>
+
+        <div v-if="form.isPublic" class="mood-sharing-section">
+          <label class="checkbox-option">
+            <input 
+              type="checkbox" 
+              v-model="shareMoodStory" 
+              class="form-checkbox"
+            />
+            <span class="checkbox-label">
+              Also share my mood as a story
+            </span>
+          </label>
+          
+          <div v-if="shareMoodStory" class="mood-message-input">
+            <label for="moodMessage" class="form-label">
+              Mood story message (optional)
+            </label>
+            <textarea
+              id="moodMessage"
+              v-model="moodMessage"
+              rows="2"
+              placeholder="Add a message to your mood story..."
+              class="form-textarea"
+              maxlength="100"
+            ></textarea>
+            <div class="char-counter">{{ moodMessage.length }}/100</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="form-actions">
+        <button
+          v-if="isEditing"
+          type="button"
+          @click="$emit('cancel')"
+          class="btn btn-secondary"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          :disabled="journalStore.loading"
+          class="btn btn-primary"
+        >
+          <span v-if="journalStore.loading" class="loading-content">
+            <LoadingSpinner class="w-4 h-4" />
+            {{ isEditing ? 'Updating...' : 'Saving...' }}
+          </span>
+          <span v-else>
+            {{ isEditing ? 'Update Entry' : 'Save Entry' }}
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { format } from 'date-fns'
-import { EMOTION_OPTIONS } from '@/types/journal'
-import type { JournalEntry } from '@/types/journal'
 import { useJournalStore } from '@/stores/journal'
+import { useMoodStore } from '@/stores/mood'
+import { EMOTION_OPTIONS, type JournalEntry } from '@/types/journal'
 import LoadingSpinner from './LoadingSpinner.vue'
 
 interface Props {
-  entry?: JournalEntry
-}
-
-interface Emits {
-  (e: 'success'): void
-  (e: 'cancel'): void
+  entry?: JournalEntry | null
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+
+const emit = defineEmits<{
+  success: []
+  cancel: []
+}>()
 
 const journalStore = useJournalStore()
-const loading = ref(false)
-const error = ref<string | null>(null)
+const moodStore = useMoodStore()
 
-const today = format(new Date(), 'yyyy-MM-dd')
-
-const form = reactive({
-  date: today,
+// Form state
+const form = ref({
+  date: format(new Date(), 'yyyy-MM-dd'),
   gratitude: '',
   emotion: '',
   challenges: '',
   learning: '',
-  isPublic: false,
+  isPublic: false
 })
 
-const isEditing = computed(() => !!props.entry?.id)
+const shareMoodStory = ref(false)
+const moodMessage = ref('')
 
+// Computed
+const today = computed(() => format(new Date(), 'yyyy-MM-dd'))
+const isEditing = computed(() => !!props.entry)
+
+// Initialize form
 onMounted(() => {
   if (props.entry) {
-    Object.assign(form, {
-      date: props.entry.date,
+    form.value = {
+      date: format(props.entry.createdAt, 'yyyy-MM-dd'),
       gratitude: props.entry.gratitude,
       emotion: props.entry.emotion,
       challenges: props.entry.challenges,
       learning: props.entry.learning,
-      isPublic: props.entry.isPublic || false,
-    })
+      isPublic: props.entry.isPublic || false
+    }
   }
 })
 
-async function handleSubmit() {
-  loading.value = true
-  error.value = null
+// Watch for entry changes
+watch(() => props.entry, (newEntry) => {
+  if (newEntry) {
+    form.value = {
+      date: format(newEntry.createdAt, 'yyyy-MM-dd'),
+      gratitude: newEntry.gratitude,
+      emotion: newEntry.emotion,
+      challenges: newEntry.challenges,
+      learning: newEntry.learning,
+      isPublic: newEntry.isPublic || false
+    }
+  }
+})
 
+// Handle form submission
+async function handleSubmit() {
   try {
-    if (isEditing.value && props.entry?.id) {
-      await journalStore.updateEntry(props.entry.id, { ...form })
+    const entryData = {
+      ...form.value,
+      createdAt: new Date(form.value.date)
+    }
+
+    if (isEditing.value && props.entry) {
+      await journalStore.updateEntry(props.entry.id!, entryData)
     } else {
-      await journalStore.addEntry({ ...form })
+      await journalStore.addEntry(entryData)
+    }
+
+    // Also share mood story if enabled
+    if (form.value.isPublic && shareMoodStory.value && form.value.emotion) {
+      const emotion = EMOTION_OPTIONS.find(e => e.value === form.value.emotion)
+      if (emotion) {
+        await moodStore.setTodaysMood(
+          emotion.value,
+          emotion.emoji,
+          moodMessage.value.trim() || undefined,
+          true
+        )
+      }
     }
 
     emit('success')
-  } catch (err) {
-    error.value = err instanceof Error ? err.message : 'An error occurred'
-  } finally {
-    loading.value = false
+    
+    // Reset form if not editing
+    if (!isEditing.value) {
+      form.value = {
+        date: format(new Date(), 'yyyy-MM-dd'),
+        gratitude: '',
+        emotion: '',
+        challenges: '',
+        learning: '',
+        isPublic: false
+      }
+      shareMoodStory.value = false
+      moodMessage.value = ''
+    }
+  } catch (error) {
+    console.error('Failed to save entry:', error)
   }
 }
 </script>
+
+<style scoped>
+/* Container */
+.journal-form-container {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Form */
+.journal-form {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+}
+
+/* Header */
+.form-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.form-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1f2937, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 0.5rem;
+}
+
+.form-subtitle {
+  color: #6b7280;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+/* Form Inputs */
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  resize: vertical;
+  min-height: 5rem;
+  transition: all 0.2s;
+  outline: none;
+  font-family: inherit;
+  color: black;
+}
+
+.form-textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Emotions Grid */
+.emotions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.emotion-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.emotion-card:hover {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.emotion-card.active {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.emotion-emoji {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.emotion-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #374151;
+  text-align: center;
+}
+
+/* Form Section */
+.form-section {
+  background: #f9fafb;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 1rem;
+}
+
+/* Privacy Options */
+.privacy-options {
+  margin-bottom: 1rem;
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  margin-bottom: 0.75rem;
+}
+
+.form-checkbox {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #3b82f6;
+}
+
+.checkbox-label {
+  font-size: 0.875rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+/* Mood Sharing Section */
+.mood-sharing-section {
+  padding-left: 1.75rem;
+  border-left: 3px solid #e5e7eb;
+}
+
+.mood-message-input {
+  margin-top: 1rem;
+}
+
+.char-counter {
+  text-align: right;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+  min-width: 120px;
+  justify-content: center;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.btn-primary:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.loading-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .journal-form {
+    padding: 1.5rem;
+  }
+  
+  .emotions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+</style>

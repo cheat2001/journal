@@ -72,6 +72,51 @@ service cloud.firestore {
              data.updatedAt is timestamp;
     }
     
+    // Helper function to check if mood story is public
+    function isPublicMoodStory() {
+      return resource.data.isPublic == true;
+    }
+    
+    // Helper function to validate mood story data
+    function isValidMoodStory() {
+      let data = request.resource.data;
+      let requiredFields = ['userId', 'userName', 'emotion', 'emoji', 'isPublic', 'date', 'createdAt', 'updatedAt'];
+      
+      // Check required fields exist
+      let hasRequiredFields = data.keys().hasAll(requiredFields);
+      
+      // Validate core data types and constraints
+      let validCoreData = data.userId == request.auth.uid &&
+             data.userName is string &&
+             data.emotion is string &&
+             data.emoji is string &&
+             data.isPublic is bool &&
+             data.date is string &&
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp &&
+             data.userName.size() <= 100 &&
+             data.emotion in ['happy', 'excited', 'calm', 'grateful', 'content', 'neutral', 'tired', 'stressed', 'anxious', 'sad', 'frustrated', 'overwhelmed'];
+      
+      // Validate optional custom message
+      let validOptionalFields = !data.keys().hasAny(['customMessage']) || 
+                                (data.customMessage is string && data.customMessage.size() <= 280);
+      
+      return hasRequiredFields && validCoreData && validOptionalFields;
+    }
+    
+    // Helper function to validate mood reaction data
+    function isValidMoodReaction() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['userId', 'userName', 'type', 'emoji', 'createdAt', 'moodStoryId']) &&
+             data.userId == request.auth.uid &&
+             data.userName is string &&
+             data.type is string &&
+             data.emoji is string &&
+             data.createdAt is timestamp &&
+             data.moodStoryId is string &&
+             data.type in ['support', 'love', 'strength', 'care', 'inspire'];
+    }
+    
     // Helper function to validate user stats
     function isValidUserStats() {
       let data = request.resource.data;
@@ -161,6 +206,43 @@ service cloud.firestore {
       
       // Prevent deletion of user stats
       allow delete: if false;
+    }
+
+    // Mood Stories Collection
+    match /mood-stories/{moodId} {
+      // Users can read all public mood stories and their own mood stories
+      allow read: if isAuthenticated() && 
+                     (isPublicMoodStory() || isOwner(resource.data.userId));
+      
+      // Users can only create their own mood stories with valid data
+      allow create: if isAuthenticated() && 
+                       isOwner(request.resource.data.userId) && 
+                       isValidMoodStory();
+      
+      // Users can only update their own mood stories with valid data
+      allow update: if isAuthenticated() && 
+                       isOwner(resource.data.userId) && 
+                       isValidMoodStory();
+      
+      // Users can only delete their own mood stories
+      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+
+    // Mood Reactions Collection
+    match /mood-reactions/{reactionId} {
+      // Users can read reactions on public mood stories
+      allow read: if isAuthenticated();
+      
+      // Users can only create their own reactions with valid data
+      allow create: if isAuthenticated() && 
+                       isOwner(request.resource.data.userId) && 
+                       isValidMoodReaction();
+      
+      // Users can only update their own reactions
+      allow update: if isAuthenticated() && isOwner(resource.data.userId);
+      
+      // Users can only delete their own reactions
+      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
     }
 
     // Deny all other access

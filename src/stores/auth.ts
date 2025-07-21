@@ -21,6 +21,15 @@ export const useAuthStore = defineStore('auth', () => {
   // Computed properties
   const isAuthenticated = computed(() => !!user.value)
   const userDisplayName = computed(() => user.value?.displayName || user.value?.email || 'User')
+  const userInitials = computed(() => {
+    const name = userDisplayName.value
+    if (name === 'User') return 'U'
+    return name
+      .split(' ')
+      .map(part => part.charAt(0).toUpperCase())
+      .join('')
+      .slice(0, 2) // Max 2 initials
+  })
 
   // Actions
   function clearError() {
@@ -188,6 +197,7 @@ export const useAuthStore = defineStore('auth', () => {
     // Computed
     isAuthenticated,
     userDisplayName,
+    userInitials,
     
     // Actions
     signUp,

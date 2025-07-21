@@ -72,6 +72,41 @@ export const EMOTION_OPTIONS: EmotionOption[] = [
   { value: 'overwhelmed', label: 'Overwhelmed', emoji: '😵' },
 ]
 
+// Mood Stories Feature Types
+export interface MoodStory {
+  id?: string
+  userId: string
+  userName: string
+  userInitials?: string
+  userAvatar?: string
+  emotion: string
+  emoji: string
+  customMessage?: string
+  isPublic: boolean
+  date: string // yyyy-MM-dd format
+  createdAt: Date
+  updatedAt: Date
+  reactions?: MoodReaction[]
+  totalReactions?: number
+}
+
+export interface MoodReaction {
+  id: string
+  userId: string
+  userName: string
+  type: string // 'support', 'love', 'strength'
+  emoji: string
+  createdAt: Date
+}
+
+export const MOOD_REACTION_TYPES = [
+  { value: 'support', emoji: '🤗', label: 'Send Support' },
+  { value: 'love', emoji: '❤️', label: 'Send Love' },
+  { value: 'strength', emoji: '💪', label: 'Send Strength' },
+  { value: 'care', emoji: '🫂', label: 'I Care' },
+  { value: 'inspire', emoji: '✨', label: 'Inspiring' },
+]
+
 // Gamification System Types
 export interface UserStats {
   currentStreak: number

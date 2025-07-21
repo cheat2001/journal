@@ -1,17 +1,17 @@
 <template>
-  <div class="bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 group">
+  <div class="bg-white/95 backdrop-blur-sm border border-gray-200/60 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 group hover:scale-[1.02] hover:border-blue-200">
     <div class="flex justify-between items-start mb-6">
       <div class="flex-1">
         <div class="flex items-center gap-3 mb-2">
-          <div class="w-12 h-12 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl flex items-center justify-center">
+          <div class="w-12 h-12 bg-gradient-to-br from-blue-100 via-purple-50 to-indigo-100 rounded-xl flex items-center justify-center shadow-sm">
             <span class="text-2xl">{{ getEmotionEmoji(entry.emotion) }}</span>
           </div>
           <div>
-            <h3 class="text-xl font-bold text-gray-900">
+            <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-900 transition-colors">
               {{ formatDate(entry.date) }}
             </h3>
             <div class="flex items-center gap-2">
-              <span class="text-sm text-gray-600 capitalize font-medium bg-gray-100 px-3 py-1 rounded-full">
+              <span class="text-sm text-gray-600 capitalize font-medium bg-gradient-to-r from-gray-100 to-gray-50 px-3 py-1 rounded-full border border-gray-200">
                 {{ entry.emotion }}
               </span>
               <span class="text-xs text-gray-400">
@@ -22,17 +22,17 @@
         </div>
       </div>
 
-      <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+      <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
         <button
           @click="$emit('edit', entry)"
-          class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+          class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
           title="Edit entry"
         >
           <PencilIcon class="w-5 h-5" />
         </button>
         <button
           @click="entry.id && $emit('delete', entry.id)"
-          class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+          class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"
           title="Delete entry"
           :disabled="!entry.id"
         >
