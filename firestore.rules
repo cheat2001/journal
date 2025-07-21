@@ -30,7 +30,7 @@ service cloud.firestore {
              data.gratitude.size() <= 1000 &&
              data.challenges.size() <= 1000 &&
              data.learning.size() <= 1000 &&
-             data.emotion in ['😊', '😔', '😴', '🤔', '😤', '❤️', '🌟'];
+             data.emotion in ['happy', 'excited', 'calm', 'grateful', 'content', 'neutral', 'tired', 'stressed', 'anxious', 'sad', 'frustrated', 'overwhelmed'];
     }
     
     // Helper function to validate user stats
