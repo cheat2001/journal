@@ -18,8 +18,13 @@ service cloud.firestore {
     // Helper function to validate journal entry data
     function isValidJournalEntry() {
       let data = request.resource.data;
-      return data.keys().hasAll(['gratitude', 'challenges', 'learning', 'emotion', 'date', 'userId', 'createdAt', 'updatedAt']) &&
-             data.gratitude is string &&
+      let requiredFields = ['gratitude', 'challenges', 'learning', 'emotion', 'date', 'userId', 'createdAt', 'updatedAt'];
+      
+      // Check required fields exist
+      let hasRequiredFields = data.keys().hasAll(requiredFields);
+      
+      // Validate core data types and constraints
+      let validCoreData = data.gratitude is string &&
              data.challenges is string &&
              data.learning is string &&
              data.emotion is string &&
@@ -31,6 +36,40 @@ service cloud.firestore {
              data.challenges.size() <= 1000 &&
              data.learning.size() <= 1000 &&
              data.emotion in ['happy', 'excited', 'calm', 'grateful', 'content', 'neutral', 'tired', 'stressed', 'anxious', 'sad', 'frustrated', 'overwhelmed'];
+      
+      // Allow optional social fields (reactions, comments, isPublic, etc.)
+      return hasRequiredFields && validCoreData;
+    }
+    
+    // Helper function to check if entry is public
+    function isPublicEntry() {
+      return resource.data.isPublic == true;
+    }
+    
+    // Helper function to validate social interactions
+    function isValidReaction() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['userId', 'userDisplayName', 'type', 'createdAt']) &&
+             data.userId == request.auth.uid &&
+             data.userDisplayName is string &&
+             data.type is map &&
+             data.type.keys().hasAll(['value', 'emoji', 'label']) &&
+             data.type.value is string &&
+             data.type.emoji is string &&
+             data.type.label is string &&
+             data.createdAt is timestamp;
+    }
+    
+    function isValidComment() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['userId', 'userDisplayName', 'userInitials', 'content', 'createdAt', 'updatedAt']) &&
+             data.userId == request.auth.uid &&
+             data.userDisplayName is string &&
+             data.userInitials is string &&
+             data.content is string &&
+             data.content.size() <= 500 &&
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp;
     }
     
     // Helper function to validate user stats
@@ -52,22 +91,57 @@ service cloud.firestore {
 
     // Journal entries collection
     match /journal-entries/{documentId} {
-      // Users can only read their own entries
-      allow read: if isAuthenticated() && isOwner(resource.data.userId);
+      // Users can read their own entries OR public entries
+      allow read: if isAuthenticated() && (isOwner(resource.data.userId) || isPublicEntry());
       
       // Users can only create entries for themselves with valid data
       allow create: if isAuthenticated() && 
                        isOwner(request.resource.data.userId) && 
                        isValidJournalEntry();
       
-      // Users can only update their own entries with valid data
+      // Users can update their own entries OR add reactions/comments to public entries
       allow update: if isAuthenticated() && 
-                       isOwner(resource.data.userId) && 
-                       isOwner(request.resource.data.userId) &&
-                       isValidJournalEntry();
+                       (
+                         // Owner can update their own entry
+                         (isOwner(resource.data.userId) && isOwner(request.resource.data.userId) && isValidJournalEntry()) ||
+                         // Anyone can add reactions/comments to public entries (reactions and updatedAt only)
+                         (isPublicEntry() && 
+                          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reactions', 'comments', 'updatedAt', 'totalReactions', 'totalComments']) &&
+                          request.resource.data.userId == resource.data.userId)
+                       );
       
       // Users can only delete their own entries
       allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+      
+      // Subcollection: Reactions
+      match /reactions/{reactionId} {
+        // Anyone can read reactions on public entries, only owner can read reactions on private entries
+        allow read: if isAuthenticated() && (isPublicEntry() || isOwner(get(/databases/$(database)/documents/journal-entries/$(documentId)).data.userId));
+        
+        // Users can only create their own reactions with valid data
+        allow create: if isAuthenticated() && isValidReaction();
+        
+        // Users can only update their own reactions
+        allow update: if isAuthenticated() && isOwner(resource.data.userId) && isValidReaction();
+        
+        // Users can only delete their own reactions
+        allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+      }
+      
+      // Subcollection: Comments
+      match /comments/{commentId} {
+        // Anyone can read comments on public entries, only owner can read comments on private entries
+        allow read: if isAuthenticated() && (isPublicEntry() || isOwner(get(/databases/$(database)/documents/journal-entries/$(documentId)).data.userId));
+        
+        // Users can only create their own comments with valid data
+        allow create: if isAuthenticated() && isValidComment();
+        
+        // Users can only update their own comments
+        allow update: if isAuthenticated() && isOwner(resource.data.userId) && isValidComment();
+        
+        // Users can only delete their own comments
+        allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+      }
     }
 
     // User stats collection
