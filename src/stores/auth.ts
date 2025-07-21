@@ -132,10 +132,20 @@ export const useAuthStore = defineStore('auth', () => {
     
     try {
       await updateProfile(user.value, updates)
-      // Trigger reactivity
-      user.value = { ...user.value }
+      
+      // Force reactivity by creating a new user object with updated properties
+      const updatedUser = {
+        ...user.value,
+        displayName: updates.displayName || user.value.displayName
+      }
+      
+      // Update the reactive ref
+      user.value = updatedUser
+      
+      console.log('Profile updated successfully:', updates)
     } catch (err) {
       error.value = getAuthErrorMessage(err)
+      console.error('Error updating profile:', err)
       throw err
     } finally {
       loading.value = false

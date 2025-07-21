@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, computed, onMounted } from 'vue'
+import { reactive, ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -35,15 +35,30 @@ async function handleUpdateProfile() {
   errorMessage.value = ''
   successMessage.value = ''
   
+  const newDisplayName = profileForm.displayName.trim()
+  
+  if (!newDisplayName) {
+    errorMessage.value = 'Display name cannot be empty'
+    isLoading.value = false
+    return
+  }
+  
+  console.log('Updating profile with display name:', newDisplayName)
+  
   try {
     await authStore.updateUserProfile({
-      displayName: profileForm.displayName.trim()
+      displayName: newDisplayName
     })
+    
     successMessage.value = 'Profile updated successfully!'
+    console.log('Profile update completed. New display name:', authStore.userDisplayName)
+    
     setTimeout(() => {
       successMessage.value = ''
     }, 3000)
+    
   } catch (error) {
+    console.error('Profile update error:', error)
     errorMessage.value = error instanceof Error ? error.message : 'Failed to update profile'
   } finally {
     isLoading.value = false
@@ -79,7 +94,36 @@ function goBack() {
 }
 
 onMounted(() => {
-  profileForm.displayName = authStore.userDisplayName
+  // Initialize the display name, and watch for changes
+  profileForm.displayName = authStore.userDisplayName || ''
+  
+  // Watch for auth store changes to update the form
+  const unwatch = authStore.$subscribe(() => {
+    if (authStore.userDisplayName && !profileForm.displayName) {
+      profileForm.displayName = authStore.userDisplayName
+    }
+  })
+  
+  // Also watch the userDisplayName reactive property
+  const unwatchDisplayName = watch(
+    () => authStore.userDisplayName,
+    (newDisplayName) => {
+      if (newDisplayName && newDisplayName !== profileForm.displayName) {
+        console.log('Auth store display name changed:', newDisplayName)
+        // Only update if the form is empty or significantly different
+        if (!profileForm.displayName.trim() || Math.abs(profileForm.displayName.length - newDisplayName.length) > 2) {
+          profileForm.displayName = newDisplayName
+        }
+      }
+    },
+    { immediate: true }
+  )
+  
+  // Cleanup subscription when component unmounts
+  onUnmounted(() => {
+    unwatch()
+    unwatchDisplayName()
+  })
 })
 </script>
 
