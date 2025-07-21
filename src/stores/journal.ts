@@ -16,6 +16,7 @@ import type { JournalEntry } from '@/types/journal'
 import { format, parseISO, startOfDay, endOfDay } from 'date-fns'
 import { useAuthStore } from './auth'
 import { useGamificationStore } from './gamification'
+import { SecurityValidator, RATE_LIMITS } from '@/utils/security'
 
 export const useJournalStore = defineStore('journal', () => {
   const entries = ref<JournalEntry[]>([])
@@ -122,6 +123,33 @@ export const useJournalStore = defineStore('journal', () => {
       throw new Error('User must be authenticated to add entries')
     }
     
+    // Security: Rate limiting check
+    if (!SecurityValidator.checkRateLimit('CREATE_ENTRY', RATE_LIMITS.CREATE_ENTRY.maxRequests, RATE_LIMITS.CREATE_ENTRY.timeWindow)) {
+      throw new Error('Too many requests. Please wait before creating another entry.')
+    }
+    
+    // Security: Sanitize content
+    const sanitizedEntry = {
+      ...entry,
+      gratitude: SecurityValidator.sanitizeHtml(entry.gratitude),
+      challenges: SecurityValidator.sanitizeHtml(entry.challenges),
+      learning: SecurityValidator.sanitizeHtml(entry.learning)
+    }
+    
+    // Security: Validate entry data
+    const validation = SecurityValidator.validateJournalEntry({
+      gratitude: sanitizedEntry.gratitude,
+      challenges: sanitizedEntry.challenges,
+      learning: sanitizedEntry.learning,
+      emotion: sanitizedEntry.emotion,
+      date: sanitizedEntry.date,
+      userId: authStore.user.uid
+    })
+    
+    if (!validation.isValid) {
+      throw new Error(`Invalid entry data: ${validation.errors.join(', ')}`)
+    }
+    
     const gamificationStore = useGamificationStore()
     loading.value = true
     error.value = null
@@ -129,7 +157,7 @@ export const useJournalStore = defineStore('journal', () => {
     try {
       const now = new Date()
       const newEntry = {
-        ...entry,
+        ...sanitizedEntry,
         userId: authStore.user.uid,
         userDisplayName: authStore.userDisplayName,
         userInitials: authStore.userDisplayName.split(' ').map(n => n[0]).join(''),
@@ -145,7 +173,7 @@ export const useJournalStore = defineStore('journal', () => {
         userId: authStore.user.uid,
         userDisplayName: authStore.userDisplayName,
         userInitials: authStore.userDisplayName.split(' ').map(n => n[0]).join(''),
-        ...entry,
+        ...sanitizedEntry,
         createdAt: now,
         updatedAt: now,
       })
