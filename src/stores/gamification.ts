@@ -15,6 +15,7 @@ import { db } from '@/firebase'
 import type { UserStats, Badge } from '@/types/journal'
 import { ACHIEVEMENTS } from '@/types/journal'
 import { useAuthStore } from './auth'
+import { SecurityValidator, RATE_LIMITS } from '@/utils/security'
 
 export const useGamificationStore = defineStore('gamification', () => {
   const userStats = ref<UserStats>({
@@ -148,6 +149,19 @@ export const useGamificationStore = defineStore('gamification', () => {
 
   async function updateUserStats(updates: Partial<UserStats>) {
     if (!authStore.user) return
+
+    // Security: Rate limiting check
+    if (!SecurityValidator.checkRateLimit('UPDATE_STATS', RATE_LIMITS.UPDATE_STATS.maxRequests, RATE_LIMITS.UPDATE_STATS.timeWindow)) {
+      throw new Error('Too many requests. Please wait before updating stats.')
+    }
+
+    // Security: Validate user stats data
+    const statsToValidate = { ...userStats.value, ...updates }
+    const validation = SecurityValidator.validateUserStats(statsToValidate)
+    
+    if (!validation.isValid) {
+      throw new Error(`Invalid stats data: ${validation.errors.join(', ')}`)
+    }
 
     try {
       // Update local state

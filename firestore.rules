@@ -1,0 +1,97 @@
+// Firestore Security Rules
+// Copy these rules to your Firebase Console -> Firestore Database -> Rules tab
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the document
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    // Helper function to validate journal entry data
+    function isValidJournalEntry() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['gratitude', 'challenges', 'learning', 'emotion', 'date', 'userId', 'createdAt', 'updatedAt']) &&
+             data.gratitude is string &&
+             data.challenges is string &&
+             data.learning is string &&
+             data.emotion is string &&
+             data.date is string &&
+             data.userId == request.auth.uid &&
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp &&
+             data.gratitude.size() <= 1000 &&
+             data.challenges.size() <= 1000 &&
+             data.learning.size() <= 1000 &&
+             data.emotion in ['😊', '😔', '😴', '🤔', '😤', '❤️', '🌟'];
+    }
+    
+    // Helper function to validate user stats
+    function isValidUserStats() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['currentStreak', 'longestStreak', 'totalEntries', 'badges', 'level', 'xp']) &&
+             data.currentStreak is int &&
+             data.longestStreak is int &&
+             data.totalEntries is int &&
+             data.badges is list &&
+             data.level is int &&
+             data.xp is int &&
+             data.currentStreak >= 0 &&
+             data.longestStreak >= 0 &&
+             data.totalEntries >= 0 &&
+             data.level >= 1 &&
+             data.xp >= 0;
+    }
+
+    // Journal entries collection
+    match /journal-entries/{documentId} {
+      // Users can only read their own entries
+      allow read: if isAuthenticated() && isOwner(resource.data.userId);
+      
+      // Users can only create entries for themselves with valid data
+      allow create: if isAuthenticated() && 
+                       isOwner(request.resource.data.userId) && 
+                       isValidJournalEntry();
+      
+      // Users can only update their own entries with valid data
+      allow update: if isAuthenticated() && 
+                       isOwner(resource.data.userId) && 
+                       isOwner(request.resource.data.userId) &&
+                       isValidJournalEntry();
+      
+      // Users can only delete their own entries
+      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+    }
+
+    // User stats collection
+    match /user-stats/{userId} {
+      // Users can only read their own stats
+      allow read: if isAuthenticated() && isOwner(userId);
+      
+      // Users can only create their own stats with valid data
+      allow create: if isAuthenticated() && 
+                       isOwner(userId) && 
+                       isValidUserStats();
+      
+      // Users can only update their own stats with valid data
+      allow update: if isAuthenticated() && 
+                       isOwner(userId) && 
+                       isValidUserStats();
+      
+      // Prevent deletion of user stats
+      allow delete: if false;
+    }
+
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
