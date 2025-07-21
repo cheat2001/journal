@@ -108,6 +108,31 @@
                 >
                   <MagnifyingGlassIcon class="w-6 h-6" />
                 </button>
+                <button 
+                  v-if="searchDate"
+                  @click="clearSearch" 
+                  class="bg-blue-100 hover:bg-blue-200 text-blue-700 p-3 rounded-xl transition-all duration-200 hover:shadow-md"
+                  title="Clear filter"
+                >
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <!-- Filter indicator -->
+              <div v-if="isFiltering" class="mt-3 flex items-center gap-2">
+                <div class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707v4.586l-4-2V11.414a1 1 0 00-.293-.707L3.293 4.707A1 1 0 013 4z"></path>
+                  </svg>
+                  Showing entries for {{ format(new Date(searchDate), 'MMM dd, yyyy') }}
+                </div>
+                <button 
+                  @click="clearSearch"
+                  class="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
+                >
+                  Show all entries
+                </button>
               </div>
             </div>
           </div>
@@ -144,7 +169,7 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="journalStore.entries.length === 0" class="text-center py-20">
+      <div v-else-if="currentEntries.length === 0 && !isFiltering" class="text-center py-20">
         <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-12 max-w-md mx-auto">
           <div class="text-6xl mb-6">📖</div>
           <h3 class="text-2xl font-bold text-gray-900 mb-4">Start Your Journal Journey</h3>
@@ -162,12 +187,42 @@
         </div>
       </div>
 
+      <!-- Empty Filter State -->
+      <div v-else-if="isFiltering && currentEntries.length === 0" class="text-center py-20">
+        <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-12 max-w-md mx-auto">
+          <div class="text-6xl mb-6">📅</div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-4">No Entries Found</h3>
+          <p class="text-gray-600 mb-8 text-lg leading-relaxed">
+            No journal entries were found for {{ format(new Date(searchDate), 'MMMM dd, yyyy') }}.
+          </p>
+          <div class="flex gap-3 justify-center">
+            <button 
+              @click="clearSearch" 
+              class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+            >
+              Show All Entries
+            </button>
+            <button 
+              @click="showNewEntryForm = true" 
+              class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+            >
+              Create Entry
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Entries List -->
-      <div v-else-if="!journalStore.loading && journalStore.entries.length > 0" class="space-y-8">
+      <div v-else-if="!journalStore.loading && currentEntries.length > 0" class="space-y-8">
         <div class="flex items-center justify-between">
-          <h3 class="text-2xl font-bold text-gray-900">Your Journal Entries</h3>
+          <h3 class="text-2xl font-bold text-gray-900">
+            <span v-if="isFiltering">Filtered Journal Entries</span>
+            <span v-else>Your Journal Entries</span>
+          </h3>
           <div class="text-sm text-gray-500">
-            {{ journalStore.entries.length }} {{ journalStore.entries.length === 1 ? 'entry' : 'entries' }} total
+            {{ currentEntries.length }} {{ currentEntries.length === 1 ? 'entry' : 'entries' }} 
+            <span v-if="isFiltering">for {{ searchDate }}</span>
+            <span v-else>total</span>
           </div>
         </div>
         
@@ -315,18 +370,24 @@ const showNewEntryForm = ref(false)
 const editingEntry = ref<JournalEntry | null>(null)
 const deletingEntryId = ref<string | null>(null)
 const searchDate = ref('')
+const filteredEntries = ref<JournalEntry[]>([])
+const isFiltering = ref(false)
 const entriesPerPage = 10
 const currentPage = ref(1)
 
 const today = format(new Date(), 'yyyy-MM-dd')
 
 // Computed properties
+const currentEntries = computed(() => {
+  return isFiltering.value ? filteredEntries.value : journalStore.entries
+})
+
 const displayedEntries = computed(() => {
-  return journalStore.entries.slice(0, currentPage.value * entriesPerPage)
+  return currentEntries.value.slice(0, currentPage.value * entriesPerPage)
 })
 
 const hasMoreEntries = computed(() => {
-  return journalStore.entries.length > currentPage.value * entriesPerPage
+  return currentEntries.value.length > currentPage.value * entriesPerPage
 })
 
 const streakDays = computed(() => {
@@ -395,15 +456,27 @@ function loadMoreEntries() {
 
 async function searchByDate() {
   if (searchDate.value) {
-    await journalStore.getEntriesByDate(searchDate.value)
-    // You could implement a filtered view here
-    // For now, we'll just scroll to the entry if it exists
-    const targetEntry = journalStore.entries.find((entry) => entry.date === searchDate.value)
-    if (targetEntry) {
-      // Scroll to the entry (you'd need to implement this)
-      console.log('Found entry for date:', searchDate.value)
+    try {
+      console.log('Searching for entries on date:', searchDate.value)
+      const dateEntries = await journalStore.getEntriesByDate(searchDate.value)
+      console.log('Found entries:', dateEntries)
+      console.log('Entry dates:', dateEntries.map(entry => ({ id: entry.id, date: entry.date, createdAt: entry.createdAt })))
+      
+      filteredEntries.value = dateEntries
+      isFiltering.value = true
+      currentPage.value = 1 // Reset pagination
+      console.log(`Found ${dateEntries.length} entries for date:`, searchDate.value)
+    } catch (error) {
+      console.error('Error searching by date:', error)
     }
   }
+}
+
+function clearSearch() {
+  searchDate.value = ''
+  filteredEntries.value = []
+  isFiltering.value = false
+  currentPage.value = 1
 }
 
 // Lifecycle
