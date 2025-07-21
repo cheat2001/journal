@@ -188,13 +188,21 @@ export const useMoodStore = defineStore('mood', () => {
         const data = doc.data()
         return {
           id: doc.id,
-          ...data,
+          userId: data.userId,
+          userName: data.userName,
+          userInitials: data.userInitials,
+          userAvatar: data.userAvatar,
+          emotion: data.emotion,
+          emoji: data.emoji,
+          customMessage: data.customMessage,
+          isPublic: data.isPublic,
+          date: data.date,
           createdAt: safeToDate(data.createdAt),
           updatedAt: safeToDate(data.updatedAt),
           reactions: [], // Initialize empty reactions array
           totalReactions: 0, // Initialize total reactions
-        }
-      }) as MoodStory[]
+        } as MoodStory
+      })
 
       // Fetch reactions for all stories
       await fetchReactionsForStories(stories)
