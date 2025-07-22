@@ -525,6 +525,21 @@ onMounted(async () => {
   justify-content: center;
   padding: 20px;
   z-index: 50;
+  overflow-y: auto;
+}
+
+@media (max-height: 700px) {
+  .modal-overlay {
+    align-items: flex-start;
+    padding: 20px 20px 40px;
+  }
+}
+
+@media (max-width: 640px) {
+  .modal-overlay {
+    padding: 10px;
+    align-items: flex-start;
+  }
 }
 
 .modal-content {
@@ -534,6 +549,17 @@ onMounted(async () => {
   max-width: 500px;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
   overflow: hidden;
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+}
+
+@media (max-width: 640px) {
+  .modal-content {
+    max-height: calc(100vh - 20px);
+    margin: 10px auto;
+  }
 }
 
 .modal-header {
@@ -570,6 +596,14 @@ onMounted(async () => {
 
 .modal-body {
   padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+@media (max-width: 640px) {
+  .modal-body {
+    padding: 16px;
+  }
 }
 
 /* Emotions Section */
@@ -591,6 +625,13 @@ onMounted(async () => {
   gap: 12px;
 }
 
+@media (max-width: 640px) {
+  .emotions-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+}
+
 .emotion-btn {
   display: flex;
   flex-direction: column;
@@ -601,6 +642,14 @@ onMounted(async () => {
   background: white;
   cursor: pointer;
   transition: all 0.2s;
+  min-height: 70px;
+}
+
+@media (max-width: 640px) {
+  .emotion-btn {
+    padding: 8px 4px;
+    min-height: 60px;
+  }
 }
 
 .emotion-btn:hover {
@@ -618,10 +667,23 @@ onMounted(async () => {
   margin-bottom: 4px;
 }
 
+@media (max-width: 640px) {
+  .emotion-btn .emoji {
+    font-size: 20px;
+    margin-bottom: 2px;
+  }
+}
+
 .emotion-btn .name {
   font-size: 11px;
   font-weight: 500;
   color: #374151;
+}
+
+@media (max-width: 640px) {
+  .emotion-btn .name {
+    font-size: 10px;
+  }
 }
 
 /* Message Section */
@@ -639,6 +701,14 @@ onMounted(async () => {
   outline: none;
   transition: border-color 0.2s;
   color: black;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .message-input {
+    padding: 10px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
 }
 
 .message-input:focus {
@@ -680,6 +750,14 @@ onMounted(async () => {
   padding: 20px;
   border-top: 1px solid #e5e7eb;
   background: #f9fafb;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .modal-footer {
+    padding: 16px;
+    gap: 8px;
+  }
 }
 
 .btn {
@@ -690,6 +768,14 @@ onMounted(async () => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  min-height: 44px;
+}
+
+@media (max-width: 640px) {
+  .btn {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
 }
 
 .btn-secondary {
