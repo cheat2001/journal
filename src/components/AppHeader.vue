@@ -363,7 +363,7 @@ async function handleLogout() {
 }
 
 async function handleUpdateProfile() {
-  profileError.value = null
+  profileError.value = ''
   profileSuccess.value = false
   
   try {
@@ -381,7 +381,7 @@ async function handleUpdateProfile() {
 
 function closeProfile() {
   showProfile.value = false
-  profileError.value = null
+  profileError.value = ''
   profileSuccess.value = false
   // Reset form to current user data
   profileForm.displayName = authStore.userDisplayName
