@@ -1,27 +1,19 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, watch, ref } from 'vue'
+import { onMounted, onUnmounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useNotificationStore } from '@/stores/notification'
-import { useRoute } from 'vue-router'
 import AuthForms from '@/components/AuthForms.vue'
 import AppHeader from '@/components/AppHeader.vue'
 import ToastNotifications from '@/components/ToastNotifications.vue'
-import NotificationDebug from '@/components/NotificationDebug.vue'
 import { RouterView } from 'vue-router'
 
 const authStore = useAuthStore()
 const notificationStore = useNotificationStore()
-const route = useRoute()
-
-const showDebugPanel = ref(false)
 
 onMounted(async () => {
   console.log('🔄 App.vue mounted, initializing auth listener...')
   await authStore.initializeAuthListener()
   console.log('✅ Auth listener initialized')
-
-  // Check if debug mode is enabled via URL parameter
-  showDebugPanel.value = route.query.debug === 'true'
 })
 
 // Watch for authentication changes to initialize notifications
@@ -79,12 +71,6 @@ onUnmounted(() => {
     
     <!-- Global Toast Notifications -->
     <ToastNotifications />
-
-    <!-- Debug Panel (only in development with ?debug=true) -->
-    <NotificationDebug 
-      v-if="showDebugPanel" 
-      @close="showDebugPanel = false"
-    />
   </div>
 </template>
 

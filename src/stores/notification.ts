@@ -6,7 +6,6 @@ import {
   addDoc, 
   query, 
   where, 
-  orderBy, 
   limit, 
   onSnapshot, 
   updateDoc,
@@ -232,10 +231,6 @@ export const useNotificationStore = defineStore('notification', () => {
     }
   }
 
-  function shouldShowNotification(type: Notification['type']): boolean {
-    return settings.value[type as keyof NotificationSettings] as boolean
-  }
-
   // Create notifications
   async function createNotification(notification: Omit<Notification, 'id' | 'createdAt'>) {
     try {
@@ -452,22 +447,6 @@ export const useNotificationStore = defineStore('notification', () => {
     return id
   }
 
-  function showNotificationToast(notification: Notification) {
-    showToast({
-      type: 'info',
-      title: notification.title,
-      message: notification.message,
-      duration: 6000,
-      action: notification.data.redirectUrl ? {
-        label: 'View',
-        handler: () => {
-          window.location.href = notification.data.redirectUrl!
-          markAsRead(notification.id)
-        }
-      } : undefined
-    })
-  }
-
   function removeToast(toastId: string) {
     const index = toasts.value.findIndex(t => t.id === toastId)
     if (index > -1) {
@@ -521,33 +500,6 @@ export const useNotificationStore = defineStore('notification', () => {
     }
   }
 
-  // Test function for development
-  async function createTestNotification() {
-    if (!authStore.user?.uid) {
-      console.warn('❌ User not authenticated - cannot create test notification')
-      return
-    }
-
-    console.log('🧪 Creating test notification...')
-    
-    await createNotification({
-      userId: authStore.user.uid,
-      type: 'comment',
-      title: 'Test Notification',
-      message: 'This is a test notification to verify the system is working!',
-      data: {
-        redirectUrl: '/',
-        fromUserId: 'test-user',
-        fromUserName: 'Test User',
-        fromUserInitials: 'TU'
-      },
-      isRead: false,
-      priority: 'normal'
-    })
-
-    console.log('✅ Test notification created!')
-  }
-
   // Cleanup
   function cleanup() {
     stopNotificationListener()
@@ -587,9 +539,6 @@ export const useNotificationStore = defineStore('notification', () => {
     
     // Toast
     showToast,
-    removeToast,
-
-    // Development
-    createTestNotification
+    removeToast
   }
 })

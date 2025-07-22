@@ -179,7 +179,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { useMoodStore } from '@/stores/mood'
 import { useAuthStore } from '@/stores/auth'
 import { EMOTION_OPTIONS } from '@/types/journal'
-import type { MoodStory, MoodReaction } from '@/types/journal'
+import type { MoodStory } from '@/types/journal'
 
 const moodStore = useMoodStore()
 const authStore = useAuthStore()
