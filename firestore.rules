@@ -242,7 +242,8 @@ service cloud.firestore {
       allow update: if isAuthenticated() && isOwner(resource.data.userId);
       
       // Users can only delete their own reactions
-      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+      allow delete: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid;
     }
 
     // Deny all other access

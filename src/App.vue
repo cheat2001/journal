@@ -7,8 +7,10 @@ import { RouterView } from 'vue-router'
 
 const authStore = useAuthStore()
 
-onMounted(() => {
-  authStore.initializeAuthListener()
+onMounted(async () => {
+  console.log('🔄 App.vue mounted, initializing auth listener...')
+  await authStore.initializeAuthListener()
+  console.log('✅ Auth listener initialized')
 })
 </script>
 

@@ -304,39 +304,13 @@ async function reactToStory(story: MoodStory, reaction: typeof quickReactions[0]
   reactionLoading.value = reaction.value
   
   try {
-    // Optimistic update - add reaction immediately to local state
-    const optimisticReaction: MoodReaction = {
-      id: 'temp-' + Date.now(),
-      userId: authStore.user?.uid || '',
-      userName: authStore.userDisplayName || 'You',
-      type: reaction.value,
-      emoji: reaction.emoji,
-      createdAt: new Date(),
-    }
-    
-    // Update the viewing story immediately for instant feedback
-    if (viewingStory.value && viewingStory.value.id === story.id) {
-      // Remove any existing reaction from this user first
-      const existingReactionIndex = viewingStory.value.reactions?.findIndex(
-        r => r.userId === authStore.user?.uid
-      ) || -1
-      
-      if (existingReactionIndex !== -1 && viewingStory.value.reactions) {
-        viewingStory.value.reactions.splice(existingReactionIndex, 1)
-      }
-      
-      // Add new reaction
-      viewingStory.value.reactions = [...(viewingStory.value.reactions || []), optimisticReaction]
-      viewingStory.value.totalReactions = viewingStory.value.reactions.length
-    }
-    
-    // Now make the actual API call
+    // Make the API call without optimistic updates - let the store handle everything
     await moodStore.reactToMoodStory(story.id, reaction.value, reaction.emoji)
     
     // Show success feedback
     console.log(`✅ Reacted with ${reaction.emoji} ${reaction.label}`)
     
-    // Refresh the viewing story with real data
+    // Update the viewing story with fresh data from the store
     if (viewingStory.value && viewingStory.value.id === story.id) {
       const updatedStory = moodStore.publicMoodStories.find(s => s.id === story.id)
       if (updatedStory) {
@@ -346,27 +320,33 @@ async function reactToStory(story: MoodStory, reaction: typeof quickReactions[0]
     
   } catch (error) {
     console.error('❌ Failed to react:', error)
-    
-    // Revert optimistic update on error
-    if (viewingStory.value && viewingStory.value.id === story.id) {
-      const tempReactionIndex = viewingStory.value.reactions?.findIndex(
-        r => r.id.startsWith('temp-')
-      ) || -1
-      
-      if (tempReactionIndex !== -1 && viewingStory.value.reactions) {
-        viewingStory.value.reactions.splice(tempReactionIndex, 1)
-        viewingStory.value.totalReactions = viewingStory.value.reactions.length
-      }
-    }
   } finally {
     reactionLoading.value = null
   }
 }
 
 // Initialize
-onMounted(() => {
+onMounted(async () => {
+  console.log('🔄 MoodStoriesHeader mounted, checking auth state...')
+  
   if (authStore.isAuthenticated) {
-    moodStore.fetchPublicMoodStories()
+    console.log('✅ User authenticated, fetching mood stories...')
+    try {
+      await moodStore.fetchPublicMoodStories()
+      console.log('✅ Mood stories fetched successfully')
+    } catch (error) {
+      console.error('❌ Failed to fetch mood stories on mount:', error)
+    }
+  } else {
+    console.log('⏳ User not yet authenticated, waiting...')
+    // Watch for auth changes
+    const unwatch = authStore.$subscribe(() => {
+      if (authStore.isAuthenticated && !moodStore.loading) {
+        console.log('✅ Auth state changed to authenticated, fetching stories...')
+        moodStore.fetchPublicMoodStories()
+        unwatch() // Stop watching after first successful auth
+      }
+    })
   }
 })
 </script>
