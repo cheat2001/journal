@@ -45,14 +45,34 @@
           </router-link>
         </nav>
 
-        <!-- User Menu -->
-        <div class="relative" v-if="authStore.isAuthenticated">
+        <!-- Mobile Menu Button -->
+        <button
+          v-if="authStore.isAuthenticated"
+          @click="showMobileMenu = !showMobileMenu"
+          class="md:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
+          aria-label="Toggle mobile menu"
+        >
+          <svg v-if="!showMobileMenu" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+          <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+
+        <!-- Actions Section -->
+        <div class="flex items-center space-x-2 sm:space-x-4">
+          <!-- Notification Center -->
+          <NotificationCenter v-if="authStore.isAuthenticated" />
+
+          <!-- User Menu -->
+          <div class="relative" v-if="authStore.isAuthenticated">
           <button
             @click="showUserMenu = !showUserMenu"
-            class="flex items-center space-x-3 text-gray-700 hover:text-gray-900 focus:outline-none group transition-all duration-200 p-2 rounded-xl hover:bg-gray-50"
+            class="flex items-center space-x-2 sm:space-x-3 text-gray-700 hover:text-gray-900 focus:outline-none group transition-all duration-200 p-2 rounded-xl hover:bg-gray-50"
           >
             <div class="relative">
-              <div class="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg group-hover:shadow-xl transition-all duration-200 group-hover:scale-105">
+              <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg group-hover:shadow-xl transition-all duration-200 group-hover:scale-105">
                 {{ userInitials }}
               </div>
               <!-- Online indicator -->
@@ -68,7 +88,7 @@
           <!-- Dropdown Menu -->
           <div
             v-if="showUserMenu"
-            class="absolute right-0 mt-3 w-56 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200/50 py-2 z-50 fade-in"
+            class="absolute right-0 mt-3 w-56 max-w-[calc(100vw-1rem)] bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200/50 py-2 z-50 fade-in"
           >
             <div class="px-4 py-3 border-b border-gray-100">
               <p class="text-sm font-medium text-gray-900">{{ authStore.userDisplayName }}</p>
@@ -170,6 +190,64 @@
         </div>
       </div>
     </div>
+    
+    <!-- Mobile Navigation Menu -->
+    <div
+      v-if="showMobileMenu && authStore.isAuthenticated"
+      class="md:hidden bg-white/95 backdrop-blur-md border-t border-gray-200/50 shadow-lg"
+    >
+      <div class="px-4 py-3 space-y-2">
+        <router-link
+          to="/"
+          @click="showMobileMenu = false"
+          class="flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200"
+          :class="$route.path === '/' 
+            ? 'bg-blue-100 text-blue-700 shadow-sm' 
+            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+        >
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2m-6 4h4"></path>
+          </svg>
+          Journal
+        </router-link>
+        
+        <router-link
+          to="/feed"
+          @click="showMobileMenu = false"
+          class="flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200"
+          :class="$route.path === '/feed' 
+            ? 'bg-purple-100 text-purple-700 shadow-sm' 
+            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+        >
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          Community
+        </router-link>
+
+        <router-link
+          to="/profile"
+          @click="showMobileMenu = false"
+          class="flex items-center px-4 py-3 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200"
+        >
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          Profile Settings
+        </router-link>
+
+        <button
+          @click="handleLogout"
+          class="flex items-center w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-all duration-200"
+        >
+          <ArrowRightOnRectangleIcon class="w-5 h-5 mr-3" />
+          Sign out
+        </button>
+      </div>
+    </div>
+    </div>
 
     <!-- Profile Modal -->
     <div
@@ -251,12 +329,14 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ChevronDownIcon, UserIcon, ArrowRightOnRectangleIcon } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
+import NotificationCenter from './NotificationCenter.vue'
 
 const authStore = useAuthStore()
 
 const showUserMenu = ref(false)
+const showMobileMenu = ref(false)
 const showProfile = ref(false)
-const profileError = ref<string | null>(null)
+const profileError = ref('')
 const profileSuccess = ref(false)
 
 const profileForm = reactive({

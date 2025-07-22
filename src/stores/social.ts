@@ -14,6 +14,7 @@ import { db } from '@/firebase'
 import type { JournalEntry, Reaction, Comment } from '@/types/journal'
 import { REACTION_TYPES } from '@/types/journal'
 import { useAuthStore } from './auth'
+import { useNotificationStore } from './notification'
 
 export const useSocialStore = defineStore('social', () => {
   const publicEntries = ref<JournalEntry[]>([])
@@ -21,6 +22,7 @@ export const useSocialStore = defineStore('social', () => {
   const error = ref<string | null>(null)
   
   const authStore = useAuthStore()
+  const notificationStore = useNotificationStore()
 
   // Actions
   async function fetchPublicEntries(limitCount = 20) {
@@ -133,6 +135,16 @@ export const useSocialStore = defineStore('social', () => {
         if (!entry.reactions) entry.reactions = []
         entry.reactions.push(reaction)
         entry.totalReactions = entry.reactions.length
+
+        // 🔔 Send notification to entry owner
+        if (entry.userId !== authStore.user.uid) {
+          await notificationStore.notifyReaction(
+            entryId,
+            entry.userId,
+            reactionTypeObj,
+            authStore.userDisplayName
+          )
+        }
       }
 
       console.log('Reaction added:', reactionType)
@@ -202,6 +214,17 @@ export const useSocialStore = defineStore('social', () => {
         if (!entry.comments) entry.comments = []
         entry.comments.push(comment)
         entry.totalComments = entry.comments.length
+
+        // 🔔 Send notification to entry owner
+        if (entry.userId !== authStore.user.uid) {
+          await notificationStore.notifyComment(
+            entryId,
+            entry.userId,
+            authStore.userDisplayName,
+            content.trim(),
+            comment.id
+          )
+        }
       }
 
       console.log('Comment added')

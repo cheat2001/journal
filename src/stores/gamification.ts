@@ -15,6 +15,7 @@ import { db } from '@/firebase'
 import type { UserStats, Badge } from '@/types/journal'
 import { ACHIEVEMENTS } from '@/types/journal'
 import { useAuthStore } from './auth'
+import { useNotificationStore } from './notification'
 import { SecurityValidator, RATE_LIMITS } from '@/utils/security'
 
 export const useGamificationStore = defineStore('gamification', () => {
@@ -32,6 +33,7 @@ export const useGamificationStore = defineStore('gamification', () => {
   const newlyUnlockedBadges = ref<Badge[]>([])
   
   const authStore = useAuthStore()
+  const notificationStore = useNotificationStore()
 
   // Computed properties
   const currentLevel = computed(() => Math.floor(userStats.value.xp / 1000) + 1)
@@ -143,6 +145,12 @@ export const useGamificationStore = defineStore('gamification', () => {
 
     await updateUserStats(updates)
     
+    // 🔔 Check for streak milestones and send notifications
+    const streakMilestones = [3, 7, 14, 30, 50, 100]
+    if (streakMilestones.includes(newStreak)) {
+      await notificationStore.notifyStreakMilestone(newStreak)
+    }
+    
     // Check for achievements
     await checkAndUnlockAchievements()
   }
@@ -248,6 +256,11 @@ export const useGamificationStore = defineStore('gamification', () => {
       
       // Show celebration
       newlyUnlockedBadges.value = newBadges
+      
+      // 🔔 Send notifications for new achievements
+      for (const badge of newBadges) {
+        await notificationStore.notifyAchievement(badge.name, badge.description, badge.id)
+      }
       
       // Clear after 5 seconds
       setTimeout(() => {
