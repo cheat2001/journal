@@ -114,7 +114,7 @@ service cloud.firestore {
              data.emoji is string &&
              data.createdAt is timestamp &&
              data.moodStoryId is string &&
-             data.type in ['support', 'love', 'strength', 'care', 'inspire'];
+             data.type in ['support', 'love', 'strength', 'care', 'inspire', 'hug'];
     }
     
     // Helper function to validate user stats
