@@ -353,6 +353,7 @@ import { PlusIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
 import { useJournalStore } from '@/stores/journal'
 import { useAuthStore } from '@/stores/auth'
 import { useGamificationStore } from '@/stores/gamification'
+import { useSocialStore } from '@/stores/social'
 import type { JournalEntry } from '@/types/journal'
 import { EMOTION_OPTIONS } from '@/types/journal'
 import JournalEntryForm from '@/components/JournalEntryForm.vue'
@@ -365,6 +366,7 @@ import BadgeCelebration from '@/components/BadgeCelebration.vue'
 const journalStore = useJournalStore()
 const authStore = useAuthStore()
 const gamificationStore = useGamificationStore()
+const socialStore = useSocialStore()
 
 const showNewEntryForm = ref(false)
 const editingEntry = ref<JournalEntry | null>(null)
@@ -487,6 +489,8 @@ onMounted(async () => {
   // Initialize gamification data
   if (authStore.isAuthenticated) {
     await gamificationStore.fetchUserStats()
+    // Load social interactions for public entries in personal journal
+    await socialStore.fetchPublicEntries()
   }
 })
 </script>

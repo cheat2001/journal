@@ -144,14 +144,18 @@ service cloud.firestore {
                        isOwner(request.resource.data.userId) && 
                        isValidJournalEntry();
       
-      // Users can update their own entries OR add reactions/comments to public entries
+      // Users can update their own entries OR add reactions/comments to public entries OR increment views on public entries
       allow update: if isAuthenticated() && 
                        (
                          // Owner can update their own entry
                          (isOwner(resource.data.userId) && isOwner(request.resource.data.userId) && isValidJournalEntry()) ||
-                         // Anyone can add reactions/comments to public entries (reactions and updatedAt only)
+                         // Anyone can add reactions/comments to public entries
                          (isPublicEntry() && 
                           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reactions', 'comments', 'updatedAt', 'totalReactions', 'totalComments']) &&
+                          request.resource.data.userId == resource.data.userId) ||
+                         // Anyone can increment view count on public entries
+                         (isPublicEntry() && 
+                          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views']) &&
                           request.resource.data.userId == resource.data.userId)
                        );
       

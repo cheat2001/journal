@@ -3,13 +3,21 @@ export interface JournalEntry {
   userId: string
   userDisplayName?: string
   userInitials?: string
-  date: string
+  authorName?: string // Display name for public entries
+  title?: string // Title for public entries
+  content?: string // Full content for public entries
+  date: string | Date
   gratitude: string
   emotion: string
   challenges: string
   learning: string
   createdAt: Date
   updatedAt: Date
+  views?: number // View count for public entries
+  mood?: {
+    emoji: string
+    label: string
+  }
   // Social features
   isPublic: boolean
   reactions?: Reaction[]
@@ -30,6 +38,7 @@ export interface Comment {
   id: string
   userId: string
   userDisplayName: string
+  authorName: string // Alias for userDisplayName for consistency
   userInitials: string
   content: string
   createdAt: Date

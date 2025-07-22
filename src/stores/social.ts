@@ -196,6 +196,7 @@ export const useSocialStore = defineStore('social', () => {
         id: crypto.randomUUID(),
         userId: authStore.user.uid,
         userDisplayName: authStore.userDisplayName,
+        authorName: authStore.userDisplayName, // Add authorName alias
         userInitials: authStore.userDisplayName.split(' ').map(n => n[0]).join(''),
         content: content.trim(),
         createdAt: new Date(),
@@ -276,6 +277,71 @@ export const useSocialStore = defineStore('social', () => {
     error.value = null
   }
 
+  // New methods for enhanced social interactions
+  function getReactions(entryId: string): Record<string, number> {
+    const entry = publicEntries.value.find(e => e.id === entryId)
+    if (!entry?.reactions) return {}
+
+    const reactionCounts: Record<string, number> = {}
+    entry.reactions.forEach(reaction => {
+      const emoji = reaction.type.emoji
+      reactionCounts[emoji] = (reactionCounts[emoji] || 0) + 1
+    })
+    
+    return reactionCounts
+  }
+
+  function getComments(entryId: string): Comment[] {
+    const entry = publicEntries.value.find(e => e.id === entryId)
+    return entry?.comments || []
+  }
+
+  function getTotalReactions(entry: JournalEntry): number {
+    return entry.reactions?.length || 0
+  }
+
+  function getCommentCount(entry: JournalEntry): number {
+    return entry.comments?.length || 0
+  }
+
+  function hasUserReacted(entryId: string, emoji: string): boolean {
+    const entry = publicEntries.value.find(e => e.id === entryId)
+    if (!entry?.reactions || !authStore.user) return false
+
+    return entry.reactions.some(reaction => 
+      reaction.userId === authStore.user!.uid && reaction.type.emoji === emoji
+    )
+  }
+
+  async function toggleReaction(entryId: string, emoji: string) {
+    if (!authStore.user) {
+      throw new Error('User must be authenticated')
+    }
+
+    const entry = publicEntries.value.find(e => e.id === entryId)
+    if (!entry) throw new Error('Entry not found')
+
+    const existingReaction = entry.reactions?.find(r => 
+      r.userId === authStore.user!.uid && r.type.emoji === emoji
+    )
+
+    if (existingReaction) {
+      // Remove reaction
+      await removeReaction(entryId, existingReaction.id)
+    } else {
+      // Add reaction
+      const reactionType = REACTION_TYPES.find(r => r.emoji === emoji) || 
+        { value: 'like', emoji: emoji, label: 'Like' }
+      await addReaction(entryId, reactionType.value)
+    }
+  }
+
+  async function loadEntryInteractions(entryId: string) {
+    // For now, we'll use the existing publicEntries data
+    // In a real implementation, you might want to fetch specific entry data
+    return Promise.resolve()
+  }
+
   return {
     // State
     publicEntries,
@@ -289,6 +355,15 @@ export const useSocialStore = defineStore('social', () => {
     removeReaction,
     addComment,
     deleteComment,
-    clearError
+    clearError,
+    
+    // New methods for enhanced social interactions
+    getReactions,
+    getComments,
+    getTotalReactions,
+    getCommentCount,
+    hasUserReacted,
+    toggleReaction,
+    loadEntryInteractions
   }
 })

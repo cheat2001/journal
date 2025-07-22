@@ -61,11 +61,11 @@ export const useJournalStore = defineStore('journal', () => {
   const entriesByDate = computed(() => {
     return entries.value.reduce(
       (acc, entry) => {
-        const date = entry.date
-        if (!acc[date]) {
-          acc[date] = []
+        const dateString = typeof entry.date === 'string' ? entry.date : entry.date.toISOString().split('T')[0]
+        if (!acc[dateString]) {
+          acc[dateString] = []
         }
-        acc[date].push(entry)
+        acc[dateString].push(entry)
         return acc
       },
       {} as Record<string, JournalEntry[]>,
@@ -215,7 +215,8 @@ export const useJournalStore = defineStore('journal', () => {
       })
 
       // Update gamification stats
-      await gamificationStore.updateStreak(entry.date)
+      const dateString = typeof entry.date === 'string' ? entry.date : entry.date.toISOString().split('T')[0]
+      await gamificationStore.updateStreak(dateString)
     } catch (err) {
       error.value = `Failed to add entry: ${err instanceof Error ? err.message : 'Unknown error'}`
       console.error('Error adding entry:', err)

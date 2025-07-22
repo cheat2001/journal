@@ -286,8 +286,8 @@ const sortedComments = computed(() => {
 })
 
 // Methods
-function formatEntryDate(dateString: string) {
-  const date = new Date(dateString)
+function formatEntryDate(dateInput: string | Date) {
+  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput
   return date.toLocaleDateString('en-US', { 
     year: 'numeric', 
     month: 'long', 

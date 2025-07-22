@@ -29,6 +29,12 @@ const router = createRouter({
       component: () => import('../views/SocialFeedView.vue'),
       meta: { requiresAuth: true }
     },
+    {
+      path: '/entry/:id',
+      name: 'entry',
+      component: () => import('../views/EntryView.vue'),
+      // Allow both authenticated and non-authenticated users to view public entries
+    },
   ],
 })
 
