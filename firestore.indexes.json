@@ -15,7 +15,7 @@
       ]
     },
     {
-      "collectionGroup": "journalEntries",
+      "collectionGroup": "journal-entries",
       "queryScope": "COLLECTION",
       "fields": [
         {
@@ -29,7 +29,7 @@
       ]
     },
     {
-      "collectionGroup": "journalEntries",
+      "collectionGroup": "journal-entries",
       "queryScope": "COLLECTION",
       "fields": [
         {

@@ -8,7 +8,11 @@ import {
   where, 
   updateDoc,
   arrayUnion,
-  arrayRemove
+  arrayRemove,
+  orderBy,
+  limit,
+  startAfter,
+  DocumentSnapshot
 } from 'firebase/firestore'
 import { db } from '@/firebase'
 import type { JournalEntry, Reaction, Comment } from '@/types/journal'
@@ -19,29 +23,52 @@ import { useNotificationStore } from './notification'
 export const useSocialStore = defineStore('social', () => {
   const publicEntries = ref<JournalEntry[]>([])
   const loading = ref(false)
+  const loadingMore = ref(false)
   const error = ref<string | null>(null)
+  const hasMore = ref(true)
+  const lastDoc = ref<DocumentSnapshot | null>(null)
   
   const authStore = useAuthStore()
   const notificationStore = useNotificationStore()
 
   // Actions
-  async function fetchPublicEntries(limitCount = 20) {
+  async function fetchPublicEntries(limitCount = 20, isLoadMore = false) {
     if (!authStore.user) return
     
-    loading.value = true
+    if (isLoadMore) {
+      loadingMore.value = true
+    } else {
+      loading.value = true
+      // Reset pagination state for fresh fetch
+      lastDoc.value = null
+      hasMore.value = true
+      publicEntries.value = []
+    }
     error.value = null
 
     try {
-      // First, get all journal entries and filter client-side to avoid composite index requirement
-      const q = query(
+      let q = query(
         collection(db, 'journal-entries'),
-        where('isPublic', '==', true)
+        where('isPublic', '==', true),
+        orderBy('createdAt', 'desc'),
+        limit(limitCount)
       )
+
+      // Add pagination cursor if loading more
+      if (isLoadMore && lastDoc.value) {
+        q = query(
+          collection(db, 'journal-entries'),
+          where('isPublic', '==', true),
+          orderBy('createdAt', 'desc'),
+          startAfter(lastDoc.value),
+          limit(limitCount)
+        )
+      }
       
       const querySnapshot = await getDocs(q)
       
-      // Map and sort client-side
-      const allPublicEntries = querySnapshot.docs.map((doc) => {
+      // Map entries
+      const newEntries = querySnapshot.docs.map((doc) => {
         const data = doc.data()
         const entry = {
           id: doc.id,
@@ -71,18 +98,34 @@ export const useSocialStore = defineStore('social', () => {
         return entry
       })
 
-      // Sort by createdAt desc and limit client-side
-      publicEntries.value = allPublicEntries
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        .slice(0, limitCount)
+      // Update state
+      if (isLoadMore) {
+        publicEntries.value = [...publicEntries.value, ...newEntries]
+      } else {
+        publicEntries.value = newEntries
+      }
 
-      console.log('Fetched public entries:', publicEntries.value.length)
+      // Update pagination state
+      if (querySnapshot.docs.length > 0) {
+        lastDoc.value = querySnapshot.docs[querySnapshot.docs.length - 1]
+      }
+      
+      // Check if there are more documents
+      hasMore.value = querySnapshot.docs.length === limitCount
+
+      console.log(`${isLoadMore ? 'Loaded more' : 'Fetched'} public entries:`, newEntries.length, 'Total:', publicEntries.value.length)
     } catch (err) {
       error.value = `Failed to fetch public entries: ${err instanceof Error ? err.message : 'Unknown error'}`
       console.error('Error fetching public entries:', err)
     } finally {
       loading.value = false
+      loadingMore.value = false
     }
+  }
+
+  async function loadMoreEntries() {
+    if (!hasMore.value || loadingMore.value) return
+    await fetchPublicEntries(20, true)
   }
 
   async function toggleEntryVisibility(entryId: string, isPublic: boolean) {
@@ -351,10 +394,13 @@ export const useSocialStore = defineStore('social', () => {
     // State
     publicEntries,
     loading,
+    loadingMore,
     error,
+    hasMore,
     
     // Actions
     fetchPublicEntries,
+    loadMoreEntries,
     toggleEntryVisibility,
     addReaction,
     removeReaction,
