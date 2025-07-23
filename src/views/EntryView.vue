@@ -155,6 +155,7 @@
 
         <!-- Social Interaction Section -->
         <SocialInteractions
+          :key="entry.id"
           :entry="entry"
           :show-full-comments="true"
           class="bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl border border-gray-100"
@@ -188,7 +189,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { doc, getDoc, collection, query, where, orderBy, limit, getDocs, updateDoc, increment } from 'firebase/firestore'
 import { format } from 'date-fns'
@@ -206,6 +207,34 @@ const entry = ref<JournalEntry | null>(null)
 const relatedEntries = ref<JournalEntry[]>([])
 const loading = ref(true)
 
+// Watch for route parameter changes to reload data when navigating between entries
+watch(
+  () => route.params.id,
+  async (newId, oldId) => {
+    if (newId !== oldId && newId) {
+      console.log('Route changed from', oldId, 'to', newId, '- reloading entry data')
+      
+      // Scroll to top when navigating to a new entry
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      
+      loading.value = true
+      entry.value = null
+      relatedEntries.value = []
+      
+      await loadEntry()
+      await loadRelatedEntries()
+      
+      // Load social interactions for the new entry
+      if (typeof newId === 'string') {
+        await socialStore.loadEntryInteractions(newId)
+      }
+      
+      await incrementViewCount()
+    }
+  },
+  { immediate: false }
+)
+
 onMounted(async () => {
   // Ensure auth is initialized first
   if (authStore.loading) {
@@ -214,6 +243,13 @@ onMounted(async () => {
   
   await loadEntry()
   await loadRelatedEntries()
+  
+  // Load social interactions for the current entry
+  const entryId = route.params.id
+  if (typeof entryId === 'string') {
+    await socialStore.loadEntryInteractions(entryId)
+  }
+  
   await incrementViewCount()
 })
 
