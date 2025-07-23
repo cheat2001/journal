@@ -265,7 +265,7 @@
               v-model="newComment"
               placeholder="Write a comment..."
               rows="2"
-              class="w-full text-sm sm:text-base border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              class="w-full text-sm sm:text-base border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-black"
               @keydown.meta.enter="submitComment"
               @keydown.ctrl.enter="submitComment"
             ></textarea>

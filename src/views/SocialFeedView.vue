@@ -144,11 +144,13 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, nextTick, watch } from 'vue'
 import { useSocialStore } from '@/stores/social'
+import { useAuthStore } from '@/stores/auth'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import SocialFeedCard from '@/components/SocialFeedCard.vue'
 import MoodStoriesHeader from '@/components/MoodStoriesHeader.vue'
 
 const socialStore = useSocialStore()
+const authStore = useAuthStore()
 const loadMoreTrigger = ref<HTMLElement | null>(null)
 const showScrollToTop = ref(false)
 let observer: IntersectionObserver | null = null
@@ -230,9 +232,11 @@ async function handleReaction(data: { entryId: string; reactionType: string; isA
     if (data.isAdding) {
       await socialStore.addReaction(data.entryId, data.reactionType)
     } else {
-      // Find user's existing reaction to remove
+      // Find user's existing reaction to remove - must match both reaction type AND user ID
       const entry = socialStore.publicEntries.find(e => e.id === data.entryId)
-      const userReaction = entry?.reactions?.find(r => r.type.value === data.reactionType)
+      const userReaction = entry?.reactions?.find(r => 
+        r.type.value === data.reactionType && r.userId === authStore.user?.uid
+      )
       if (userReaction) {
         await socialStore.removeReaction(data.entryId, userReaction.id)
       }

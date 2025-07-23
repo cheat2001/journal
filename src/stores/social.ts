@@ -154,14 +154,27 @@ export const useSocialStore = defineStore('social', () => {
       throw new Error('User must be authenticated')
     }
 
+    const currentUserId = authStore.user.uid
+
     try {
+      // Check if user already has this reaction type
+      const entry = publicEntries.value.find(e => e.id === entryId)
+      const existingReaction = entry?.reactions?.find(r => 
+        r.userId === currentUserId && r.type.value === reactionType
+      )
+      
+      if (existingReaction) {
+        console.log('User already has this reaction type, skipping...')
+        return
+      }
+
       // Find the reaction type details
       const reactionTypeObj = REACTION_TYPES.find(r => r.value === reactionType) || 
         { value: reactionType, emoji: '👍', label: 'Like' }
 
       const reaction: Reaction = {
         id: crypto.randomUUID(),
-        userId: authStore.user.uid,
+        userId: currentUserId,
         userDisplayName: authStore.userDisplayName,
         type: reactionTypeObj,
         createdAt: new Date()
@@ -174,7 +187,6 @@ export const useSocialStore = defineStore('social', () => {
       })
 
       // Update local state
-      const entry = publicEntries.value.find(e => e.id === entryId)
       if (entry) {
         if (!entry.reactions) entry.reactions = []
         entry.reactions.push(reaction)
@@ -204,11 +216,22 @@ export const useSocialStore = defineStore('social', () => {
       throw new Error('User must be authenticated')
     }
 
+    const currentUserId = authStore.user.uid
+
     try {
       const entry = publicEntries.value.find(e => e.id === entryId)
       const reaction = entry?.reactions?.find(r => r.id === reactionId)
       
-      if (!reaction) return
+      if (!reaction) {
+        console.log('Reaction not found:', reactionId)
+        return
+      }
+
+      // Security check: only allow users to remove their own reactions
+      if (reaction.userId !== currentUserId) {
+        console.error('User can only remove their own reactions')
+        return
+      }
 
       const entryRef = doc(db, 'journal-entries', entryId)
       await updateDoc(entryRef, {
