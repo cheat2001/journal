@@ -81,6 +81,7 @@
           :entry="entry"
           @reaction="handleReaction"
           @comment="handleComment"
+          @delete-comment="handleDeleteComment"
         />
 
         <!-- Loading More Indicator -->

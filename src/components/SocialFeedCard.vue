@@ -220,6 +220,36 @@
       </div>
     </div>
 
+    <!-- Comments Count Display -->
+    <div v-if="entry.comments && entry.comments.length > 0" class="px-4 sm:px-6 py-3"
+         :class="entry.reactions && entry.reactions.length > 0 ? '' : 'border-t border-gray-100'">
+      <div class="flex items-center space-x-3 text-sm text-gray-600">
+        <span class="font-medium">Comments:</span>
+        <div class="flex items-center space-x-2">
+          <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+          </svg>
+          <span class="font-semibold text-gray-800">{{ entry.comments.length }}</span>
+          <span class="text-gray-500">{{ entry.comments.length === 1 ? 'comment' : 'comments' }}</span>
+          
+          <!-- Show first few commenters' avatars -->
+          <div class="flex -space-x-1 ml-2">
+            <div v-for="comment in entry.comments.slice(0, 3)" 
+                 :key="comment.id"
+                 class="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-blue-500 flex items-center justify-center border border-white text-xs font-bold text-white shadow-sm hover:scale-110 transition-transform"
+                 :title="comment.userDisplayName">
+              {{ comment.userInitials }}
+            </div>
+            <div v-if="entry.comments.length > 3"
+                 class="w-5 h-5 rounded-full bg-gray-400 flex items-center justify-center border border-white text-xs font-bold text-white shadow-sm"
+                 :title="`${entry.comments.length - 3} more`">
+              +{{ entry.comments.length - 3 }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Comments Section -->
     <div v-if="showComments" class="border-t border-gray-100">
       <!-- Add Comment Form -->
