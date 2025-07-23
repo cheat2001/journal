@@ -21,6 +21,7 @@
         <div 
           v-for="story in publicMoodStories.slice(0, 11)" 
           :key="story.id"
+          :id="`mood-story-${story.id}`"
           class="story-card user-story"
           @click="viewStory(story)"
         >
@@ -175,12 +176,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { formatDistanceToNow } from 'date-fns'
 import { useMoodStore } from '@/stores/mood'
 import { useAuthStore } from '@/stores/auth'
 import { EMOTION_OPTIONS } from '@/types/journal'
 import type { MoodStory } from '@/types/journal'
 
+const route = useRoute()
 const moodStore = useMoodStore()
 const authStore = useAuthStore()
 
@@ -332,8 +335,24 @@ onMounted(async () => {
   if (authStore.isAuthenticated) {
     console.log('✅ User authenticated, fetching mood stories...')
     try {
-      await moodStore.fetchPublicMoodStories()
+      // Check if we need to load more days for highlighted mood story
+      const highlightId = route.query.highlight
+      const daysBack = highlightId ? 7 : 0 // Load last 7 days if highlighting specific story
+      
+      await moodStore.fetchPublicMoodStories(daysBack)
       console.log('✅ Mood stories fetched successfully')
+      
+      // If highlighting a specific story, scroll to it after a short delay
+      if (highlightId) {
+        setTimeout(() => {
+          const element = document.getElementById(`mood-story-${highlightId}`)
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            // Add a highlight effect
+            element.style.animation = 'pulse 2s ease-in-out 3'
+          }
+        }, 500)
+      }
     } catch (error) {
       console.error('❌ Failed to fetch mood stories on mount:', error)
     }
@@ -343,7 +362,12 @@ onMounted(async () => {
     const unwatch = authStore.$subscribe(() => {
       if (authStore.isAuthenticated && !moodStore.loading) {
         console.log('✅ Auth state changed to authenticated, fetching stories...')
-        moodStore.fetchPublicMoodStories()
+        
+        // Check if we need to load more days for highlighted mood story
+        const highlightId = route.query.highlight
+        const daysBack = highlightId ? 7 : 0
+        
+        moodStore.fetchPublicMoodStories(daysBack)
         unwatch() // Stop watching after first successful auth
       }
     })
@@ -1050,6 +1074,17 @@ onMounted(async () => {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    transform: scale(1); 
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% { 
+    transform: scale(1.05); 
+    box-shadow: 0 0 20px 5px rgba(59, 130, 246, 0.2);
+  }
 }
 
 .reaction-emoji {

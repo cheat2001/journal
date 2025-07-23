@@ -15,6 +15,7 @@ import {
 import { db } from '@/firebase'
 import type { MoodStory, MoodReaction } from '@/types/journal'
 import { useAuthStore } from './auth'
+import { useNotificationStore } from './notification'
 import { format } from 'date-fns'
 
 // Utility function to safely convert various date formats to Date objects
@@ -32,6 +33,7 @@ function safeToDate(dateField: unknown): Date {
 
 export const useMoodStore = defineStore('mood', () => {
   const authStore = useAuthStore()
+  const notificationStore = useNotificationStore()
   
   const moodStories = ref<MoodStory[]>([])
   const todaysMood = ref<MoodStory | null>(null)
@@ -167,62 +169,73 @@ export const useMoodStore = defineStore('mood', () => {
     }
   }
   
-  // Fetch public mood stories for today
-  async function fetchPublicMoodStories() {
+  // Fetch public mood stories for today and recent days
+  async function fetchPublicMoodStories(daysBack: number = 0) {
     if (!authStore.user) {
       console.log('❌ Cannot fetch mood stories: user not authenticated')
       return
     }
     
     loading.value = true
-    console.log('🔄 Fetching public mood stories for today:', today)
     
     try {
-      // Simple query without orderBy to avoid index issues
-      const q = query(
-        collection(db, 'mood-stories'),
-        where('isPublic', '==', true),
-        where('date', '==', today),
-        limit(50) // Limit to recent 50 stories
-      )
+      const allStories: MoodStory[] = []
       
-      const querySnapshot = await getDocs(q)
-      console.log(`📝 Found ${querySnapshot.size} public mood stories`)
-      
-      const stories = querySnapshot.docs.map(doc => {
-        const data = doc.data()
-        return {
-          id: doc.id,
-          userId: data.userId,
-          userName: data.userName,
-          userInitials: data.userInitials,
-          userAvatar: data.userAvatar,
-          emotion: data.emotion,
-          emoji: data.emoji,
-          customMessage: data.customMessage,
-          isPublic: data.isPublic,
-          date: data.date,
-          createdAt: safeToDate(data.createdAt),
-          updatedAt: safeToDate(data.updatedAt),
-          reactions: [], // Initialize empty reactions array
-          totalReactions: 0, // Initialize total reactions
-        } as MoodStory
-      })
+      // Fetch stories day by day to avoid composite index requirement
+      for (let i = 0; i <= daysBack; i++) {
+        const targetDate = new Date()
+        targetDate.setDate(targetDate.getDate() - i)
+        const dateStr = format(targetDate, 'yyyy-MM-dd')
+        
+        console.log(`🔄 Fetching mood stories for ${dateStr}`)
+        
+        const q = query(
+          collection(db, 'mood-stories'),
+          where('isPublic', '==', true),
+          where('date', '==', dateStr),
+          limit(50)
+        )
+        
+        const querySnapshot = await getDocs(q)
+        console.log(`📝 Found ${querySnapshot.size} stories for ${dateStr}`)
+        
+        const dayStories = querySnapshot.docs.map(doc => {
+          const data = doc.data()
+          return {
+            id: doc.id,
+            userId: data.userId,
+            userName: data.userName,
+            userInitials: data.userInitials,
+            userAvatar: data.userAvatar,
+            emotion: data.emotion,
+            emoji: data.emoji,
+            customMessage: data.customMessage,
+            isPublic: data.isPublic,
+            date: data.date,
+            createdAt: safeToDate(data.createdAt),
+            updatedAt: safeToDate(data.updatedAt),
+            reactions: [], // Initialize empty reactions array
+            totalReactions: 0, // Initialize total reactions
+          } as MoodStory
+        })
+
+        allStories.push(...dayStories)
+      }
 
       // Fetch reactions for all stories
       console.log('🔄 Fetching reactions for stories...', {
         authUser: authStore.user?.uid,
-        storiesCount: stories.length,
+        storiesCount: allStories.length,
         timestamp: new Date().toISOString()
       })
-      await fetchReactionsForStories(stories)
+      await fetchReactionsForStories(allStories)
 
       // Sort manually by creation time (newest first)
-      stories.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      allStories.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
 
       // Merge with existing stories, avoiding duplicates
       const existingIds = new Set(moodStories.value.map(story => story.id))
-      const newStories = stories.filter(story => !existingIds.has(story.id))
+      const newStories = allStories.filter(story => !existingIds.has(story.id))
 
       // Update the moodStories array
       if (newStories.length > 0) {
@@ -231,7 +244,7 @@ export const useMoodStore = defineStore('mood', () => {
         console.log(`✅ Added ${newStories.length} new stories to the list`)
       } else {
         // If no new stories, just update existing ones with fresh reaction data
-        stories.forEach(freshStory => {
+        allStories.forEach(freshStory => {
           const existingIndex = moodStories.value.findIndex(s => s.id === freshStory.id)
           if (existingIndex !== -1) {
             moodStories.value[existingIndex] = freshStory
@@ -397,6 +410,21 @@ export const useMoodStore = defineStore('mood', () => {
         updatedStory.reactions = [...(updatedStory.reactions || []), newReaction]
         updatedStory.totalReactions = updatedStory.reactions.length
         moodStories.value[storyIndex] = updatedStory
+
+        // 🔔 Send notification to mood story owner
+        try {
+          await notificationStore.notifyMoodReaction(
+            moodId,
+            updatedStory.userId,
+            authStore.userDisplayName || 'Someone',
+            reactionType,
+            reactionEmoji,
+            updatedStory.emoji
+          )
+        } catch (notificationError) {
+          console.warn('⚠️ Failed to send mood reaction notification:', notificationError)
+          // Don't throw - notification failure shouldn't break the reaction
+        }
       }
       
       console.log('✅ Reaction added successfully:', reactionType)

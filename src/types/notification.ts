@@ -15,6 +15,10 @@ export interface Notification {
     streakCount?: number
     redirectUrl?: string
     isConversationNotification?: boolean
+    moodStoryId?: string
+    moodReactionType?: string
+    moodReactionEmoji?: string
+    moodEmoji?: string
   }
   isRead: boolean
   priority: 'low' | 'normal' | 'high'
@@ -64,6 +68,11 @@ export const NotificationTemplates = {
     title: () => `💬 New comment in conversation`,
     message: (userName: string, preview: string) => 
       `${userName} joined the conversation: "${preview.length > 50 ? preview.substring(0, 50) + '...' : preview}"`
+  },
+  MOOD_REACTION: {
+    title: (userName: string, reactionEmoji: string) => `${reactionEmoji} ${userName} reacted to your mood`,
+    message: (userName: string, reactionLabel: string, moodEmoji: string) => 
+      `${userName} sent ${reactionLabel} to your ${moodEmoji} mood story`
   },
   ACHIEVEMENT: {
     title: (achievementName: string) => `🏆 Achievement Unlocked!`,

@@ -368,6 +368,41 @@ export const useNotificationStore = defineStore('notification', () => {
     console.log(`Notified ${participants.size} comment participants about new comment on entry ${entryId}`)
   }
 
+  async function notifyMoodReaction(
+    moodStoryId: string,
+    moodStoryOwnerId: string,
+    fromUserName: string,
+    reactionType: string,
+    reactionEmoji: string,
+    moodEmoji: string
+  ) {
+    if (!authStore.user || moodStoryOwnerId === authStore.user.uid) {
+      // Don't notify if user is reacting to their own mood story
+      return
+    }
+
+    await createNotification({
+      userId: moodStoryOwnerId,
+      type: 'reaction',
+      title: NotificationTemplates.MOOD_REACTION.title(fromUserName, reactionEmoji),
+      message: NotificationTemplates.MOOD_REACTION.message(fromUserName, reactionType, moodEmoji),
+      data: {
+        moodStoryId,
+        fromUserId: authStore.user.uid,
+        fromUserName,
+        fromUserInitials: fromUserName.split(' ').map(n => n[0]).join(''),
+        moodReactionType: reactionType,
+        moodReactionEmoji: reactionEmoji,
+        moodEmoji: moodEmoji,
+        redirectUrl: `/feed?highlight=${moodStoryId}` // Navigate to social feed and highlight the specific mood story
+      },
+      isRead: false,
+      priority: 'normal'
+    })
+
+    console.log(`Notified ${moodStoryOwnerId} about mood reaction: ${reactionType} from ${fromUserName}`)
+  }
+
   async function notifyAchievement(achievementName: string, achievementDescription: string, achievementId: string) {
     if (!authStore.user?.uid) return
 
@@ -588,6 +623,7 @@ export const useNotificationStore = defineStore('notification', () => {
     notifyReaction,
     notifyComment,
     notifyCommentParticipants,
+    notifyMoodReaction,
     notifyAchievement,
     notifyStreakMilestone,
     
