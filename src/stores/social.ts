@@ -279,20 +279,22 @@ export const useSocialStore = defineStore('social', () => {
       // Update local state
       const entry = publicEntries.value.find(e => e.id === entryId)
       if (entry) {
+        // Get existing comments before adding the new one (for participant notifications)
+        const existingComments = entry.comments || []
+        
         if (!entry.comments) entry.comments = []
         entry.comments.push(comment)
         entry.totalComments = entry.comments.length
 
-        // 🔔 Send notification to entry owner
-        if (entry.userId !== authStore.user.uid) {
-          await notificationStore.notifyComment(
-            entryId,
-            entry.userId,
-            authStore.userDisplayName,
-            content.trim(),
-            comment.id
-          )
-        }
+        // 🔔 Send notifications to entry owner and all comment participants
+        await notificationStore.notifyCommentParticipants(
+          entryId,
+          entry.userId,
+          existingComments,
+          authStore.userDisplayName,
+          content.trim(),
+          comment.id
+        )
       }
 
       console.log('Comment added')

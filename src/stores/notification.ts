@@ -315,6 +315,59 @@ export const useNotificationStore = defineStore('notification', () => {
     })
   }
 
+  async function notifyCommentParticipants(
+    entryId: string,
+    entryOwnerId: string,
+    existingComments: Array<{ userId: string; userDisplayName: string }>,
+    fromUserName: string,
+    commentPreview: string,
+    commentId: string
+  ) {
+    if (!authStore.user?.uid) return
+
+    const currentUserId = authStore.user.uid
+    
+    // Get unique participants (excluding current user and entry owner who gets separate notification)
+    const participants = new Set<string>()
+    const participantDetails = new Map<string, string>()
+    
+    existingComments.forEach(comment => {
+      if (comment.userId !== currentUserId && comment.userId !== entryOwnerId) {
+        participants.add(comment.userId)
+        participantDetails.set(comment.userId, comment.userDisplayName)
+      }
+    })
+
+    // Notify entry owner (existing behavior)
+    if (entryOwnerId !== currentUserId) {
+      await notifyComment(entryId, entryOwnerId, fromUserName, commentPreview, commentId)
+    }
+
+    // Notify all comment participants
+    for (const participantId of participants) {
+      const participantName = participantDetails.get(participantId)
+      await createNotification({
+        userId: participantId,
+        type: 'comment',
+        title: NotificationTemplates.COMMENT_CONVERSATION.title(),
+        message: NotificationTemplates.COMMENT_CONVERSATION.message(fromUserName, commentPreview),
+        data: {
+          entryId,
+          commentId,
+          fromUserId: currentUserId,
+          fromUserName,
+          fromUserInitials: fromUserName.split(' ').map(n => n[0]).join(''),
+          redirectUrl: `/entry/${entryId}`,
+          isConversationNotification: true
+        },
+        isRead: false,
+        priority: 'normal'
+      })
+    }
+
+    console.log(`Notified ${participants.size} comment participants about new comment on entry ${entryId}`)
+  }
+
   async function notifyAchievement(achievementName: string, achievementDescription: string, achievementId: string) {
     if (!authStore.user?.uid) return
 
@@ -534,6 +587,7 @@ export const useNotificationStore = defineStore('notification', () => {
     // Helpers
     notifyReaction,
     notifyComment,
+    notifyCommentParticipants,
     notifyAchievement,
     notifyStreakMilestone,
     

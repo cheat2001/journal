@@ -14,6 +14,7 @@ export interface Notification {
     achievementId?: string
     streakCount?: number
     redirectUrl?: string
+    isConversationNotification?: boolean
   }
   isRead: boolean
   priority: 'low' | 'normal' | 'high'
@@ -58,6 +59,11 @@ export const NotificationTemplates = {
     title: (userName: string) => `💬 ${userName} commented`,
     message: (userName: string, preview: string) => 
       `${userName}: "${preview.length > 50 ? preview.substring(0, 50) + '...' : preview}"`
+  },
+  COMMENT_CONVERSATION: {
+    title: () => `💬 New comment in conversation`,
+    message: (userName: string, preview: string) => 
+      `${userName} joined the conversation: "${preview.length > 50 ? preview.substring(0, 50) + '...' : preview}"`
   },
   ACHIEVEMENT: {
     title: (achievementName: string) => `🏆 Achievement Unlocked!`,

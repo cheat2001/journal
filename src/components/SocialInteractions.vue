@@ -445,19 +445,8 @@ async function addComment() {
   isAddingComment.value = true
   
   try {
+    // The social store now handles all notifications (entry owner + participants)
     await socialStore.addComment(props.entry.id, newComment.value.trim())
-    
-    // Send notification to entry author
-    if (props.entry.userId !== authStore.user?.uid) {
-      await notificationStore.notifyComment(
-        props.entry.id,
-        props.entry.userId,
-        authStore.userDisplayName,
-        newComment.value.trim(),
-        crypto.randomUUID() // Comment ID will be generated in the store
-      )
-    }
-    
     newComment.value = ''
   } catch (error) {
     console.error('Error adding comment:', error)
