@@ -32,7 +32,7 @@ export const useSocialStore = defineStore('social', () => {
   const notificationStore = useNotificationStore()
 
   // Actions
-  async function fetchPublicEntries(limitCount = 20, isLoadMore = false) {
+  async function fetchPublicEntries(limitCount = 10, isLoadMore = false) {
     if (!authStore.user) return
     
     if (isLoadMore) {
@@ -125,7 +125,7 @@ export const useSocialStore = defineStore('social', () => {
 
   async function loadMoreEntries() {
     if (!hasMore.value || loadingMore.value) return
-    await fetchPublicEntries(20, true)
+    await fetchPublicEntries(10, true)
   }
 
   async function toggleEntryVisibility(entryId: string, isPublic: boolean) {
