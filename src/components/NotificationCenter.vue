@@ -5,8 +5,8 @@
       @click="toggleDropdown"
       :class="[
         'relative p-2 rounded-lg transition-all duration-200',
-        'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white',
-        'hover:bg-gray-100 dark:hover:bg-gray-700',
+        'text-gray-600 hover:text-gray-900',
+        'hover:bg-gray-100',
         'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
         unreadCount > 0 ? 'animate-pulse' : ''
       ]"
@@ -43,25 +43,25 @@
     >
       <div
         v-if="isOpen"
-        class="absolute right-0 mt-2 w-80 sm:w-96 max-w-[calc(100vw-1rem)] bg-white dark:bg-gray-800 rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+        class="absolute right-0 mt-2 w-80 sm:w-96 max-w-[calc(100vw-1rem)] bg-white rounded-xl shadow-xl ring-1 ring-gray-200 focus:outline-none z-50"
         @click.stop
       >
         <!-- Header -->
-        <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+        <div class="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-gray-900">
             Notifications
           </h3>
           <div class="flex items-center space-x-2">
             <button
               v-if="unreadCount > 0"
               @click="handleMarkAllRead"
-              class="text-xs text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium px-2 py-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+              class="text-xs text-blue-600 hover:text-blue-500 font-medium px-2 py-1 rounded hover:bg-blue-50 transition-colors"
             >
               Mark all read
             </button>
             <button
               @click="closeDropdown"
-              class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              class="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-100 transition-colors"
             >
               <XMarkIcon class="w-4 h-4" />
             </button>
@@ -73,29 +73,29 @@
           <!-- Loading State -->
           <div v-if="loading" class="p-6 text-center">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Loading notifications...</p>
+            <p class="text-sm text-gray-500">Loading notifications...</p>
           </div>
 
           <!-- Empty State -->
           <div v-else-if="recentNotifications.length === 0" class="p-6 text-center">
-            <BellSlashIcon class="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600 mb-3" />
-            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">
+            <BellSlashIcon class="mx-auto h-12 w-12 text-gray-300 mb-3" />
+            <h3 class="text-sm font-medium text-gray-900 mb-1">
               No notifications yet
             </h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400">
+            <p class="text-xs text-gray-500">
               When people interact with your entries, you'll see notifications here
             </p>
           </div>
 
           <!-- Notification Items -->
-          <div v-else class="divide-y divide-gray-100 dark:divide-gray-700">
+          <div v-else class="divide-y divide-gray-100">
             <div
               v-for="notification in recentNotifications"
               :key="notification.id"
               @click="handleNotificationClick(notification)"
               :class="[
-                'px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-150 relative',
-                !notification.isRead ? 'bg-blue-50 dark:bg-blue-900/10' : ''
+                'px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150 relative',
+                !notification.isRead ? 'bg-blue-50' : ''
               ]"
             >
                 <!-- Unread indicator -->
@@ -117,11 +117,11 @@
                   <div class="flex-1 min-w-0">
                     <!-- Header with title and time -->
                     <div class="flex items-start justify-between mb-1">
-                      <p class="text-sm font-semibold text-gray-900 dark:text-white pr-2">
+                      <p class="text-sm font-semibold text-gray-900 pr-2">
                         {{ notification.title }}
                       </p>
                       <div class="flex items-center space-x-1 flex-shrink-0">
-                        <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                        <span class="text-xs text-gray-500 whitespace-nowrap">
                           {{ formatTime(notification.createdAt) }}
                         </span>
                         <div
@@ -132,7 +132,7 @@
                     </div>
                     
                     <!-- Message -->
-                    <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                    <p class="text-sm text-gray-600 leading-relaxed">
                       {{ notification.message }}
                     </p>
                     
@@ -143,7 +143,7 @@
                           {{ notification.data.fromUserInitials }}
                         </span>
                       </div>
-                      <span class="text-sm text-gray-500 dark:text-gray-400">
+                      <span class="text-sm text-gray-500">
                         {{ notification.data.fromUserName }}
                       </span>
                       
@@ -158,10 +158,10 @@
           </div>
 
           <!-- View All Link -->
-          <div v-if="notifications.length > recentNotifications.length" class="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+          <div v-if="notifications.length > recentNotifications.length" class="p-3 border-t border-gray-200 bg-gray-50">
             <button 
               @click="viewAllNotifications"
-              class="w-full text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium py-2 px-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+              class="w-full text-sm text-blue-600 hover:text-blue-500 font-medium py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors"
             >
               View all {{ notifications.length }} notifications
             </button>
@@ -193,6 +193,7 @@ import {
   InformationCircleIcon
 } from '@heroicons/vue/24/outline'
 import { onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useNotificationStore } from '@/stores/notification'
 import { storeToRefs } from 'pinia'
 import { formatDistanceToNow } from 'date-fns'
@@ -200,7 +201,8 @@ import type { Notification } from '@/types/notification'
 
 const notificationStore = useNotificationStore()
 const { notifications, recentNotifications, unreadCount, loading } = storeToRefs(notificationStore)
-const { markAllAsRead, navigateToNotification } = notificationStore
+const { markAllAsRead } = notificationStore
+const router = useRouter()
 
 const isOpen = ref(false)
 
@@ -230,17 +232,31 @@ function handleNotificationClick(notification: Notification) {
       
       if (notification.data.redirectUrl) {
         console.log('🔗 Using redirect URL:', notification.data.redirectUrl)
-        window.location.href = notification.data.redirectUrl
+        // Use Vue Router for internal navigation
+        router.push(notification.data.redirectUrl)
+      } else if (notification.data.entryId) {
+        // For reactions and comments, navigate to the specific entry
+        console.log('🔗 Navigating to entry:', notification.data.entryId)
+        router.push(`/entry/${notification.data.entryId}`)
       } else {
-        // Default navigation
-        const defaultUrl = (notification.type === 'reaction' || notification.type === 'comment') ? '/feed' : '/'
-        console.log('🔗 Using default URL:', defaultUrl)
-        window.location.href = defaultUrl
+        // Default navigation based on notification type
+        let defaultRoute = '/'
+        
+        if (notification.type === 'reaction' || notification.type === 'comment') {
+          defaultRoute = '/feed'
+        } else if (notification.type === 'achievement' || notification.type === 'streak') {
+          defaultRoute = '/'
+        }
+        
+        console.log('🔗 Using default route:', defaultRoute)
+        router.push(defaultRoute)
       }
     }, 150)
     
   } catch (error) {
     console.error('❌ Error handling notification click:', error)
+    // Fallback to home page
+    router.push('/')
   }
 }
 
@@ -282,15 +298,15 @@ function getNotificationIconColor(type: string) {
 
 function getNotificationBgColor(type: string) {
   const colors = {
-    reaction: 'bg-pink-100 dark:bg-pink-900/30',
-    comment: 'bg-blue-100 dark:bg-blue-900/30',
-    achievement: 'bg-yellow-100 dark:bg-yellow-900/30',
-    streak: 'bg-orange-100 dark:bg-orange-900/30',
-    reminder: 'bg-purple-100 dark:bg-purple-900/30',
-    insight: 'bg-green-100 dark:bg-green-900/30',
-    milestone: 'bg-indigo-100 dark:bg-indigo-900/30'
+    reaction: 'bg-pink-100',
+    comment: 'bg-blue-100',
+    achievement: 'bg-yellow-100',
+    streak: 'bg-orange-100',
+    reminder: 'bg-purple-100',
+    insight: 'bg-green-100',
+    milestone: 'bg-indigo-100'
   }
-  return colors[type as keyof typeof colors] || 'bg-gray-100 dark:bg-gray-700'
+  return colors[type as keyof typeof colors] || 'bg-gray-100'
 }
 
 function formatTime(date: Date): string {

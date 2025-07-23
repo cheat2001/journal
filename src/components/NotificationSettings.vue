@@ -1,10 +1,10 @@
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 max-w-2xl mx-auto">
+  <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 max-w-2xl mx-auto">
     <div class="mb-6">
-      <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+      <h2 class="text-xl font-semibold text-gray-900 mb-2">
         Notification Preferences
       </h2>
-      <p class="text-sm text-gray-600 dark:text-gray-400">
+      <p class="text-sm text-gray-600">
         Customize how you want to receive notifications about your journal activity
       </p>
     </div>
@@ -12,36 +12,34 @@
     <div class="space-y-6">
       <!-- General Settings -->
       <div class="space-y-4">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+        <h3 class="text-lg font-medium text-gray-900">
           General Settings
         </h3>
 
         <!-- Notification Types -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-3">
-            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Activity Notifications</h4>
+            <h4 class="text-sm font-medium text-gray-700">Activity Notifications</h4>
             
             <label class="flex items-center space-x-3">
-              <input
-                v-model="localSettings.reactions"
-                type="checkbox"
-                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                              v-model="settings.reactions"
+                @change="updateSettings"
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
               />
-              <div class="flex-1">
-                <span class="text-sm font-medium text-gray-900 dark:text-white">Reactions</span>
-                <p class="text-xs text-gray-500 dark:text-gray-400">When someone reacts to your entries</p>
+              <div>
+                <span class="text-sm font-medium text-gray-900">Reactions</span>
+                <p class="text-xs text-gray-500">When someone reacts to your entries</p>
               </div>
             </label>
 
             <label class="flex items-center space-x-3">
-              <input
-                v-model="localSettings.comments"
-                type="checkbox"
-                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                              v-model="settings.comments"
+                @change="updateSettings"
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
               />
-              <div class="flex-1">
-                <span class="text-sm font-medium text-gray-900 dark:text-white">Comments</span>
-                <p class="text-xs text-gray-500 dark:text-gray-400">When someone comments on your entries</p>
+              <div>
+                <span class="text-sm font-medium text-gray-900">Comments</span>
+                <p class="text-xs text-gray-500">When someone comments on your entries</p>
               </div>
             </label>
           </div>

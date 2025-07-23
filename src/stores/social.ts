@@ -291,6 +291,11 @@ export const useSocialStore = defineStore('social', () => {
     return reactionCounts
   }
 
+  function getAllReactions(entryId: string): Reaction[] {
+    const entry = publicEntries.value.find(e => e.id === entryId)
+    return entry?.reactions || []
+  }
+
   function getComments(entryId: string): Comment[] {
     const entry = publicEntries.value.find(e => e.id === entryId)
     return entry?.comments || []
@@ -336,7 +341,7 @@ export const useSocialStore = defineStore('social', () => {
     }
   }
 
-  async function loadEntryInteractions(entryId: string) {
+  async function loadEntryInteractions(_entryId: string) {
     // For now, we'll use the existing publicEntries data
     // In a real implementation, you might want to fetch specific entry data
     return Promise.resolve()
@@ -359,6 +364,7 @@ export const useSocialStore = defineStore('social', () => {
     
     // New methods for enhanced social interactions
     getReactions,
+    getAllReactions,
     getComments,
     getTotalReactions,
     getCommentCount,

@@ -283,7 +283,7 @@ export const useNotificationStore = defineStore('notification', () => {
         fromUserName,
         fromUserInitials: fromUserName.split(' ').map(n => n[0]).join(''),
         reactionType,
-        redirectUrl: '/feed'
+        redirectUrl: `/entry/${entryId}`
       },
       isRead: false,
       priority: 'normal'
@@ -308,7 +308,7 @@ export const useNotificationStore = defineStore('notification', () => {
         fromUserId: authStore.user?.uid,
         fromUserName,
         fromUserInitials: fromUserName.split(' ').map(n => n[0]).join(''),
-        redirectUrl: '/feed'
+        redirectUrl: `/entry/${entryId}`
       },
       isRead: false,
       priority: 'normal'

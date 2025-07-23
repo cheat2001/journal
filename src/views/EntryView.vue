@@ -71,8 +71,57 @@
           </div>
 
           <!-- Entry Content -->
-          <div class="prose prose-lg max-w-none text-gray-800 leading-relaxed whitespace-pre-wrap">
-            {{ entry.content || entry.gratitude || 'No content available' }}
+          <div class="prose prose-lg max-w-none text-gray-800 leading-relaxed space-y-4">
+            <!-- Gratitude -->
+            <div v-if="entry.gratitude">
+              <h4 class="font-semibold text-gray-900 text-lg mb-2 flex items-center">
+                <span class="text-xl mr-2">🙏</span>
+                Gratitude
+              </h4>
+              <p class="whitespace-pre-wrap text-gray-700 leading-relaxed">{{ entry.gratitude }}</p>
+            </div>
+
+            <!-- Emotion -->
+            <div v-if="entry.emotion">
+              <h4 class="font-semibold text-gray-900 text-lg mb-2 flex items-center">
+                <span class="text-xl mr-2">💭</span>
+                Emotions & Feelings
+              </h4>
+              <p class="whitespace-pre-wrap text-gray-700 leading-relaxed">{{ entry.emotion }}</p>
+            </div>
+
+            <!-- Challenges -->
+            <div v-if="entry.challenges">
+              <h4 class="font-semibold text-gray-900 text-lg mb-2 flex items-center">
+                <span class="text-xl mr-2">🎯</span>
+                Challenges
+              </h4>
+              <p class="whitespace-pre-wrap text-gray-700 leading-relaxed">{{ entry.challenges }}</p>
+            </div>
+
+            <!-- Learning -->
+            <div v-if="entry.learning">
+              <h4 class="font-semibold text-gray-900 text-lg mb-2 flex items-center">
+                <span class="text-xl mr-2">📚</span>
+                Learning & Growth
+              </h4>
+              <p class="whitespace-pre-wrap text-gray-700 leading-relaxed">{{ entry.learning }}</p>
+            </div>
+
+            <!-- Fallback for entries with only content field -->
+            <div v-if="!entry.gratitude && !entry.emotion && !entry.challenges && !entry.learning && entry.content">
+              <p class="whitespace-pre-wrap text-gray-700 leading-relaxed">{{ entry.content }}</p>
+            </div>
+
+            <!-- Empty state -->
+            <div v-if="!entry.gratitude && !entry.emotion && !entry.challenges && !entry.learning && !entry.content" class="text-center py-8">
+              <div class="text-gray-400 mb-2">
+                <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+              <p class="text-gray-500">No content available for this entry</p>
+            </div>
           </div>
 
           <!-- Entry Stats -->

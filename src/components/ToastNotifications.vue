@@ -10,7 +10,7 @@
           v-for="toast in toasts"
           :key="toast.id"
           :class="[
-            'relative bg-white dark:bg-gray-800 rounded-lg shadow-lg border pointer-events-auto transform transition-all duration-300',
+            'relative bg-white rounded-lg shadow-lg border pointer-events-auto transform transition-all duration-300',
             getToastBorderColor(toast.type)
           ]"
         >
@@ -31,10 +31,10 @@
               
               <!-- Toast Content -->
               <div class="flex-1 min-w-0">
-                <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                <h4 class="text-sm font-semibold text-gray-900 mb-1">
                   {{ toast.title }}
                 </h4>
-                <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                <p class="text-sm text-gray-600 leading-relaxed">
                   {{ toast.message }}
                 </p>
                 
@@ -52,7 +52,7 @@
               <!-- Close Button -->
               <button
                 @click="removeToast(toast.id)"
-                class="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors duration-200"
+                class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors duration-200"
               >
                 <XMarkIcon class="w-5 h-5" />
               </button>
@@ -101,12 +101,12 @@ function getToastIconColor(type: string) {
 
 function getToastBorderColor(type: string) {
   const colors = {
-    success: 'border-green-200 dark:border-green-700',
-    info: 'border-blue-200 dark:border-blue-700',
-    warning: 'border-yellow-200 dark:border-yellow-700',
-    error: 'border-red-200 dark:border-red-700'
+    success: 'border-green-200',
+    info: 'border-blue-200',
+    warning: 'border-yellow-200',
+    error: 'border-red-200'
   }
-  return colors[type as keyof typeof colors] || 'border-blue-200 dark:border-blue-700'
+  return colors[type as keyof typeof colors] || 'border-blue-200'
 }
 </script>
 
