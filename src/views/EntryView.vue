@@ -132,19 +132,19 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                 </svg>
-                <span>{{ entry.views || 0 }} views</span>
+                <span class="font-medium">{{ entry.views || 0 }} views</span>
               </div>
               <div class="flex items-center space-x-1 sm:space-x-2 text-gray-500">
                 <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                 </svg>
-                <span>{{ getTotalReactions(entry) }} reactions</span>
+                <span class="font-medium">{{ getTotalReactions(entry) }} reactions</span>
               </div>
               <div class="flex items-center space-x-1 sm:space-x-2 text-gray-500">
                 <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                 </svg>
-                <span>{{ getCommentCount(entry) }} comments</span>
+                <span class="font-medium">{{ getCommentCount(entry) }} comments</span>
               </div>
             </div>
             <div class="text-xs text-gray-400">
@@ -290,10 +290,21 @@ async function loadRelatedEntries() {
 }
 
 async function incrementViewCount() {
-  if (!entry.value || !entry.value.id || !entry.value.isPublic || !authStore.isAuthenticated) return
+  if (!entry.value || !entry.value.id) return
+  
+  const authStore = useAuthStore()
+  const isOwner = authStore.user?.uid === entry.value.userId
+  
+  // Allow view counting for public entries or if user owns the entry
+  if (!entry.value.isPublic && !isOwner) return
 
   try {
-    // Only increment view count for public entries when user is authenticated
+    console.log('Attempting to increment view count for entry:', entry.value.id)
+    console.log('Entry current views:', entry.value.views)
+    console.log('Is public:', entry.value.isPublic)
+    console.log('Is owner:', isOwner)
+    
+    // Increment view count for public entries (both authenticated and non-authenticated users) or owner's entries
     await updateDoc(doc(db, 'journal-entries', entry.value.id), {
       views: increment(1)
     })
@@ -302,6 +313,8 @@ async function incrementViewCount() {
     if (entry.value) {
       entry.value.views = (entry.value.views || 0) + 1
     }
+    
+    console.log('View count incremented for entry:', entry.value.id, 'New count:', entry.value.views)
   } catch (error) {
     console.error('Error incrementing view count:', error)
     // Don't fail the whole page if view count update fails

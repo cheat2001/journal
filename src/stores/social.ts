@@ -4,6 +4,7 @@ import {
   collection, 
   getDocs, 
   doc, 
+  getDoc,
   query, 
   where, 
   updateDoc,
@@ -384,10 +385,67 @@ export const useSocialStore = defineStore('social', () => {
     }
   }
 
-  async function loadEntryInteractions(_entryId: string) {
-    // For now, we'll use the existing publicEntries data
-    // In a real implementation, you might want to fetch specific entry data
-    return Promise.resolve()
+  async function loadEntryInteractions(entryId: string) {
+    // Check if entry is already loaded in publicEntries
+    const existingEntry = publicEntries.value.find(e => e.id === entryId)
+    if (existingEntry) {
+      return // Entry already loaded with interactions
+    }
+
+    try {
+      // Fetch the specific entry document with its reactions and comments
+      const entryDoc = await getDoc(doc(db, 'journal-entries', entryId))
+      
+      if (entryDoc.exists()) {
+        const data = entryDoc.data()
+        
+        // Create entry object with proper date conversion
+        const entry = {
+          id: entryDoc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date(),
+          // Convert reaction timestamps
+          reactions: data.reactions?.map((reaction: Record<string, unknown>) => ({
+            ...reaction,
+            createdAt: reaction.createdAt && typeof reaction.createdAt === 'object' && 'toDate' in reaction.createdAt 
+              ? (reaction.createdAt as { toDate(): Date }).toDate() 
+              : new Date(reaction.createdAt as string | number | Date)
+          })) || [],
+          // Convert comment timestamps
+          comments: data.comments?.map((comment: Record<string, unknown>) => ({
+            ...comment,
+            createdAt: comment.createdAt && typeof comment.createdAt === 'object' && 'toDate' in comment.createdAt
+              ? (comment.createdAt as { toDate(): Date }).toDate()
+              : new Date(comment.createdAt as string | number | Date),
+            updatedAt: comment.updatedAt && typeof comment.updatedAt === 'object' && 'toDate' in comment.updatedAt
+              ? (comment.updatedAt as { toDate(): Date }).toDate()
+              : new Date(comment.updatedAt as string | number | Date)
+          })) || [],
+          totalReactions: data.reactions?.length || 0,
+          totalComments: data.comments?.length || 0,
+        } as JournalEntry
+
+        // Add to publicEntries if it's public, or create a temporary store for this entry
+        if (entry.isPublic) {
+          publicEntries.value.unshift(entry)
+        } else {
+          // For private entries viewed by owner, we still need to store the data temporarily
+          // This allows the social interactions to work on private entries
+          const tempIndex = publicEntries.value.findIndex(e => e.id === entryId)
+          if (tempIndex >= 0) {
+            publicEntries.value[tempIndex] = entry
+          } else {
+            publicEntries.value.unshift(entry)
+          }
+        }
+
+        console.log('Entry interactions loaded:', entryId, 'Reactions:', entry.reactions?.length || 0, 'Comments:', entry.comments?.length || 0)
+      }
+    } catch (error) {
+      console.error('Error loading entry interactions:', error)
+      // Don't throw error to prevent page from breaking
+    }
   }
 
   return {
