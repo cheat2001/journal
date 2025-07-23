@@ -123,126 +123,97 @@
 
     <!-- Actions Bar -->
     <div class="px-5 sm:px-6 py-4 sm:py-5 bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-200">
-      <div class="flex flex-col gap-4 sm:gap-5">
-        <!-- Reaction Summary and View Full Entry -->
-        <div class="flex items-center justify-between flex-wrap gap-3">
-          <div class="flex items-center space-x-3 sm:space-x-4 text-sm sm:text-base text-gray-600">
-            <span v-if="(entry.totalReactions || 0) > 0" class="flex items-center space-x-2 bg-white px-4 py-2 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-200">
-              <div class="flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-red-100 to-pink-100">
-                <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.789l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"/>
-                </svg>
-              </div>
-              <span class="font-semibold text-gray-800">{{ entry.totalReactions }}</span>
-              <span class="text-xs text-gray-500 hidden sm:inline">reactions</span>
-            </span>
-            <span v-if="(entry.totalComments || 0) > 0" class="flex items-center space-x-2 bg-white px-4 py-2 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-200">
-              <div class="flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-blue-100 to-purple-100">
-                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                </svg>
-              </div>
-              <span class="font-semibold text-gray-800">{{ entry.totalComments }}</span>
-              <span class="text-xs text-gray-500 hidden sm:inline">comments</span>
-            </span>
-          </div>
-          
-          <!-- View Full Entry Button -->
+      <div class="flex justify-between items-center gap-4">
+        <!-- View Full Entry Button -->
+        <button
+          @click="viewFullEntry"
+          class="group inline-flex items-center px-5 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:scale-105 active:scale-95 ml-auto"
+        >
+          <span class="hidden sm:inline mr-2">✨</span>
+          <span class="hidden sm:inline">View Full Entry</span>
+          <span class="sm:hidden">View Full</span>
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Interactive Actions -->
+    <div class="px-5 sm:px-6 py-4 sm:py-5 border-t border-gray-200">
+      <div class="flex items-center space-x-4 sm:space-x-6">
+        <!-- Reaction Button -->
+        <div class="relative" ref="reactionDropdown">
           <button
-            @click="viewFullEntry"
-            class="group inline-flex items-center px-5 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:scale-105 active:scale-95"
+            @click="toggleReactionDropdown"
+            class="flex items-center px-4 sm:px-6 py-3 sm:py-3.5 text-sm sm:text-base font-semibold transition-all duration-200 rounded-xl border-2"
+            :class="userHasReacted 
+              ? 'bg-blue-500 text-white border-blue-500 shadow-lg hover:bg-blue-600 hover:border-blue-600' 
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-md'"
           >
-            <span class="hidden sm:inline mr-2">✨</span>
-            <span class="hidden sm:inline">View Full Entry</span>
-            <span class="sm:hidden">View Full</span>
-            <svg class="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.789l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"/>
             </svg>
+            <span>{{ userHasReacted ? 'Liked' : 'React' }}</span>
           </button>
-        </div>
 
-        <!-- Action Buttons -->
-        <div class="flex items-center space-x-2 sm:space-x-4">
-          <!-- Reaction Button -->
-          <div class="relative" ref="reactionDropdown">
-            <button
-              @click="toggleReactionDropdown"
-              class="flex items-center px-3 sm:px-5 py-2 sm:py-2.5 text-sm font-medium transition-all duration-200 rounded-full"
-              :class="userHasReacted 
-                ? 'bg-blue-500 text-white shadow-md hover:bg-blue-600' 
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-            >
-              <svg class="w-4 h-4 mr-1 sm:mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.789l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"/>
-              </svg>
-              <span class="hidden sm:inline">{{ userHasReacted ? 'Liked' : 'Like' }}</span>
-              <span class="sm:hidden">{{ userHasReacted ? '❤️' : '👍' }}</span>
-            </button>
-
-            <!-- Enhanced Reaction Dropdown -->
-            <div v-if="showReactionDropdown" 
-                 class="absolute bottom-full left-1/2 transform -translate-x-1/2 sm:left-0 sm:transform-none mb-2 bg-white rounded-xl shadow-xl border border-gray-200 z-30">
-              <div class="flex p-2 space-x-1">
-                <button
-                  v-for="reaction in REACTION_TYPES"
-                  :key="reaction.value"
-                  @click="handleReactionClick(reaction.value)"
-                  class="p-2 sm:p-3 rounded-lg hover:bg-gray-50 text-lg sm:text-xl transition-all duration-150 hover:scale-110 active:scale-95 min-w-[40px] sm:min-w-[44px] flex items-center justify-center"
-                  :title="reaction.label"
-                >
-                  {{ reaction.emoji }}
-                </button>
-              </div>
+          <!-- Enhanced Reaction Dropdown -->
+          <div v-if="showReactionDropdown" 
+               class="absolute bottom-full left-0 mb-2 bg-white rounded-xl shadow-xl border border-gray-200 z-30 w-[280px] sm:w-[320px] ml-4 sm:ml-0">
+            <div class="flex p-2.5 justify-between items-center">
+              <button
+                v-for="reaction in REACTION_TYPES"
+                :key="reaction.value"
+                @click="handleReactionClick(reaction.value)"
+                class="p-2 rounded-lg hover:bg-gray-50 text-lg transition-all duration-150 hover:scale-110 active:scale-95 w-[38px] h-[38px] flex items-center justify-center flex-shrink-0"
+                :title="reaction.label"
+              >
+                {{ reaction.emoji }}
+              </button>
             </div>
           </div>
-
-          <!-- Comment Button -->
-          <button
-            @click="toggleComments"
-            class="flex items-center px-3 sm:px-5 py-2 sm:py-2.5 text-sm font-medium transition-all duration-200 rounded-full"
-            :class="showComments 
-              ? 'bg-purple-500 text-white shadow-md hover:bg-purple-600' 
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-          >
-            <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-            </svg>
-            <span class="hidden sm:inline">{{ showComments ? 'Hide' : 'Comment' }}</span>
-            <span class="sm:hidden">💬</span>
-          </button>
         </div>
+
+        <!-- Comment Button -->
+        <button
+          @click="toggleComments"
+          class="flex items-center px-4 sm:px-6 py-3 sm:py-3.5 text-sm sm:text-base font-semibold transition-all duration-200 rounded-xl border-2"
+          :class="showComments 
+            ? 'bg-purple-500 text-white border-purple-500 shadow-lg hover:bg-purple-600 hover:border-purple-600' 
+            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-md'"
+        >
+          <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+          </svg>
+          <span>{{ showComments ? 'Hide' : 'Comment' }}</span>
+        </button>
       </div>
     </div>
 
     <!-- Reactions Display -->
-    <div v-if="entry.reactions && entry.reactions.length > 0" class="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200 bg-gray-50">
-      <div class="flex flex-wrap gap-2 sm:gap-3">
-        <div v-for="(reactionGroup, reactionType) in groupedReactions" 
-             :key="reactionType"
-             class="inline-flex items-center bg-white rounded-full px-3 sm:px-4 py-2 sm:py-2.5 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200">
-          
-          <!-- Reaction Emoji -->
-          <span class="text-base sm:text-lg mr-2">{{ getReactionEmoji(reactionType) }}</span>
-          
-          <!-- Count -->
-          <span class="text-sm sm:text-base font-semibold text-gray-800 mr-2">{{ reactionGroup.length }}</span>
-          
-          <!-- User Avatars -->
-          <div class="flex -space-x-1.5 sm:-space-x-2">
-            <div v-for="reaction in reactionGroup.slice(0, 3)" 
-                 :key="reaction.id"
-                 class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center border-2 border-white shadow-sm hover:scale-110 hover:z-10 transition-all duration-200"
-                 :title="reaction.userDisplayName">
-              <span class="text-xs font-bold text-white">
-                {{ reaction.userDisplayName.split(' ').map(n => n[0]).join('').substring(0, 1) }}
-              </span>
-            </div>
+    <div v-if="entry.reactions && entry.reactions.length > 0" class="px-4 sm:px-6 py-3 border-t border-gray-100">
+      <div class="flex items-center space-x-3 text-sm text-gray-600">
+        <span class="font-medium">Reactions:</span>
+        <div class="flex items-center space-x-2">
+          <div v-for="(reactionGroup, reactionType) in groupedReactions" 
+               :key="reactionType"
+               class="inline-flex items-center space-x-1.5">
+            <span class="text-base">{{ getReactionEmoji(reactionType) }}</span>
+            <span class="font-semibold text-gray-800">{{ reactionGroup.length }}</span>
             
-            <!-- More users indicator -->
-            <div v-if="reactionGroup.length > 3"
-                 class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gray-400 flex items-center justify-center border-2 border-white shadow-sm"
-                 :title="`+${reactionGroup.length - 3} more`">
-              <span class="text-xs font-bold text-white">+{{ reactionGroup.length - 3 }}</span>
+            <!-- User avatars in a clean row -->
+            <div class="flex -space-x-1">
+              <div v-for="reaction in reactionGroup.slice(0, 3)" 
+                   :key="reaction.id"
+                   class="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center border border-white text-xs font-bold text-white shadow-sm hover:scale-110 transition-transform"
+                   :title="reaction.userDisplayName">
+                {{ reaction.userDisplayName[0] }}
+              </div>
+              <div v-if="reactionGroup.length > 3"
+                   class="w-5 h-5 rounded-full bg-gray-400 flex items-center justify-center border border-white text-xs font-bold text-white shadow-sm"
+                   :title="`${reactionGroup.length - 3} more`">
+                +{{ reactionGroup.length - 3 }}
+              </div>
             </div>
           </div>
         </div>
