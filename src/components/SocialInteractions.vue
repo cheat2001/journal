@@ -1,39 +1,39 @@
 <template>
-  <div class="p-6">
+  <div class="p-4 sm:p-6">
     <!-- Detailed Reaction Summary -->
-    <div v-if="totalReactions > 0" class="mb-6">
+    <div v-if="totalReactions > 0" class="mb-4 sm:mb-6">
       <!-- Reaction Overview with Avatars -->
-      <div class="flex items-center justify-between mb-4 p-4 bg-gray-50 rounded-xl">
-        <div class="flex items-center space-x-3">
-          <div class="flex -space-x-2">
+      <div class="flex items-center justify-between mb-3 sm:mb-4 p-3 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl">
+        <div class="flex items-center space-x-2 sm:space-x-3">
+          <div class="flex -space-x-1 sm:-space-x-2">
             <div
               v-for="(count, emoji) in uniqueReactions"
               :key="emoji"
-              class="w-8 h-8 bg-white border-2 border-white rounded-full flex items-center justify-center text-lg shadow-md hover:scale-110 transition-transform duration-200"
+              class="w-6 h-6 sm:w-8 sm:h-8 bg-white border-2 border-white rounded-full flex items-center justify-center text-sm sm:text-lg shadow-md hover:scale-110 transition-transform duration-200"
               :title="`${count} ${getReactionLabel(emoji)}`"
             >
               {{ emoji }}
             </div>
           </div>
-          <div class="text-sm">
+          <div class="text-xs sm:text-sm">
             <p class="font-semibold text-gray-900">{{ totalReactions }} {{ totalReactions === 1 ? 'reaction' : 'reactions' }}</p>
-            <p class="text-gray-600">{{ getTopReaction() }}</p>
+            <p class="text-gray-600 hidden sm:block">{{ getTopReaction() }}</p>
           </div>
         </div>
         
         <!-- Recent Reactors -->
-        <div v-if="recentReactors.length > 0" class="flex items-center space-x-2">
-          <div class="flex -space-x-2">
+        <div v-if="recentReactors.length > 0" class="flex items-center space-x-1 sm:space-x-2">
+          <div class="flex -space-x-1 sm:-space-x-2">
             <div
               v-for="reactor in recentReactors.slice(0, 3)"
               :key="reactor.userId"
-              class="w-6 h-6 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm"
+              class="w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-sm"
               :title="reactor.userDisplayName"
             >
               {{ getAuthorInitials(reactor.userDisplayName) }}
             </div>
           </div>
-          <span class="text-xs text-gray-500">
+          <span class="text-xs text-gray-500 hidden sm:inline">
             {{ recentReactors.length > 3 ? `+${recentReactors.length - 3} more` : '' }}
           </span>
         </div>
@@ -67,16 +67,16 @@
     </div>
 
     <!-- Enhanced Reaction Buttons -->
-    <div class="mb-6">
+    <div class="mb-4 sm:mb-6">
       <!-- Quick Reaction Bar (like the feed) -->
-      <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center space-x-3">
+      <div class="flex items-center justify-between mb-3 sm:mb-4">
+        <div class="flex items-center space-x-2 sm:space-x-3">
           <!-- Quick React Dropdown -->
           <div class="relative" ref="reactionDropdown">
             <button
               @click="toggleReactionDropdown"
               :class="[
-                'inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:scale-105',
+                'inline-flex items-center px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 hover:scale-105',
                 hasAnyReaction
                   ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
@@ -84,11 +84,12 @@
               :disabled="!authStore.isAuthenticated"
               :title="!authStore.isAuthenticated ? 'Sign in to react' : 'Quick react'"
             >
-              <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.789l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"/>
               </svg>
-              {{ hasAnyReaction ? 'Reacted' : 'React' }}
-              <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <span class="hidden sm:inline">{{ hasAnyReaction ? 'Reacted' : 'React' }}</span>
+              <span class="sm:hidden">{{ hasAnyReaction ? '👍' : 'React' }}</span>
+              <svg class="w-3 h-3 sm:w-4 sm:h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </button>
@@ -125,28 +126,30 @@
           <!-- Comment Button -->
           <button
             @click="focusCommentInput"
-            class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 transition-all duration-200"
+            class="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 transition-all duration-200"
             :disabled="!authStore.isAuthenticated"
             :title="!authStore.isAuthenticated ? 'Sign in to comment' : 'Write a comment'"
           >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
             </svg>
-            Comment
+            <span class="hidden sm:inline">Comment</span>
+            <span class="sm:hidden">💬</span>
           </button>
 
           <!-- View Details Button -->
           <button
             v-if="totalReactions > 0"
             @click="showReactionDetails = !showReactionDetails"
-            class="text-sm text-blue-600 hover:text-blue-700 font-medium px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors duration-200"
+            class="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium px-2 sm:px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors duration-200"
           >
-            {{ showReactionDetails ? 'Hide details' : 'View reactions' }}
+            <span class="hidden sm:inline">{{ showReactionDetails ? 'Hide details' : 'View reactions' }}</span>
+            <span class="sm:hidden">{{ showReactionDetails ? 'Hide' : 'View' }}</span>
           </button>
         </div>
         
         <!-- Reaction Count Summary -->
-        <div v-if="totalReactions > 0" class="text-sm text-gray-500">
+        <div v-if="totalReactions > 0" class="text-xs sm:text-sm text-gray-500">
           {{ totalReactions }} {{ totalReactions === 1 ? 'reaction' : 'reactions' }}
         </div>
       </div>
@@ -201,7 +204,7 @@
             v-model="newComment"
             placeholder="Write a comment..."
             rows="3"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm text-black"
             @keydown.ctrl.enter="addComment"
             @keydown.meta.enter="addComment"
           ></textarea>

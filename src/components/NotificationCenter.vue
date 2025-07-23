@@ -43,21 +43,22 @@
     >
       <div
         v-if="isOpen"
-        class="absolute right-0 mt-2 w-80 sm:w-96 max-w-[calc(100vw-1rem)] bg-white rounded-xl shadow-xl ring-1 ring-gray-200 focus:outline-none z-50"
+        class="absolute right-0 mt-2 w-72 sm:w-80 md:w-96 max-w-[calc(100vw-1rem)] bg-white rounded-xl shadow-xl ring-1 ring-gray-200 focus:outline-none z-50 sm:right-0 right-0"
         @click.stop
       >
         <!-- Header -->
-        <div class="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-          <h3 class="text-lg font-semibold text-gray-900">
+        <div class="px-3 sm:px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+          <h3 class="text-base sm:text-lg font-semibold text-gray-900">
             Notifications
           </h3>
-          <div class="flex items-center space-x-2">
+          <div class="flex items-center space-x-1 sm:space-x-2">
             <button
               v-if="unreadCount > 0"
               @click="handleMarkAllRead"
               class="text-xs text-blue-600 hover:text-blue-500 font-medium px-2 py-1 rounded hover:bg-blue-50 transition-colors"
             >
-              Mark all read
+              <span class="hidden sm:inline">Mark all read</span>
+              <span class="sm:hidden">Mark read</span>
             </button>
             <button
               @click="closeDropdown"
@@ -69,17 +70,17 @@
         </div>
 
         <!-- Notification List -->
-        <div class="max-h-96 overflow-y-auto">
+        <div class="max-h-80 sm:max-h-96 overflow-y-auto">
           <!-- Loading State -->
-          <div v-if="loading" class="p-6 text-center">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-            <p class="text-sm text-gray-500">Loading notifications...</p>
+          <div v-if="loading" class="p-4 sm:p-6 text-center">
+            <div class="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+            <p class="text-xs sm:text-sm text-gray-500">Loading...</p>
           </div>
 
           <!-- Empty State -->
-          <div v-else-if="recentNotifications.length === 0" class="p-6 text-center">
-            <BellSlashIcon class="mx-auto h-12 w-12 text-gray-300 mb-3" />
-            <h3 class="text-sm font-medium text-gray-900 mb-1">
+          <div v-else-if="recentNotifications.length === 0" class="p-4 sm:p-6 text-center">
+            <BellSlashIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-300 mb-2 sm:mb-3" />
+            <h3 class="text-xs sm:text-sm font-medium text-gray-900 mb-1">
               No notifications yet
             </h3>
             <p class="text-xs text-gray-500">
@@ -94,7 +95,7 @@
               :key="notification.id"
               @click="handleNotificationClick(notification)"
               :class="[
-                'px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150 relative',
+                'px-3 sm:px-4 py-3 sm:py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150 relative',
                 !notification.isRead ? 'bg-blue-50' : ''
               ]"
             >
@@ -104,12 +105,12 @@
                   class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-r-full"
                 ></div>
 
-                <div class="flex items-start space-x-3">
+                <div class="flex items-start space-x-2 sm:space-x-3">
                   <!-- Notification Icon -->
-                  <div :class="['flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center', getNotificationBgColor(notification.type)]">
+                  <div :class="['flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center', getNotificationBgColor(notification.type)]">
                     <component 
                       :is="getNotificationIcon(notification.type)" 
-                      :class="['w-5 h-5', getNotificationIconColor(notification.type)]" 
+                      :class="['w-4 h-4 sm:w-5 sm:h-5', getNotificationIconColor(notification.type)]" 
                     />
                   </div>
                   
@@ -117,7 +118,7 @@
                   <div class="flex-1 min-w-0">
                     <!-- Header with title and time -->
                     <div class="flex items-start justify-between mb-1">
-                      <p class="text-sm font-semibold text-gray-900 pr-2">
+                      <p class="text-xs sm:text-sm font-semibold text-gray-900 pr-1 sm:pr-2 leading-tight">
                         {{ notification.title }}
                       </p>
                       <div class="flex items-center space-x-1 flex-shrink-0">
@@ -132,18 +133,18 @@
                     </div>
                     
                     <!-- Message -->
-                    <p class="text-sm text-gray-600 leading-relaxed">
+                    <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
                       {{ notification.message }}
                     </p>
                     
                     <!-- User info for social notifications -->
-                    <div v-if="notification.data.fromUserName && (notification.type === 'reaction' || notification.type === 'comment')" class="mt-2 flex items-center space-x-2">
-                      <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <div v-if="notification.data.fromUserName && (notification.type === 'reaction' || notification.type === 'comment')" class="mt-1 sm:mt-2 flex items-center space-x-1 sm:space-x-2">
+                      <div class="w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                         <span class="text-xs font-bold text-white">
                           {{ notification.data.fromUserInitials }}
                         </span>
                       </div>
-                      <span class="text-sm text-gray-500">
+                      <span class="text-xs sm:text-sm text-gray-500 truncate">
                         {{ notification.data.fromUserName }}
                       </span>
                       
@@ -158,12 +159,13 @@
           </div>
 
           <!-- View All Link -->
-          <div v-if="notifications.length > recentNotifications.length" class="p-3 border-t border-gray-200 bg-gray-50">
+          <div v-if="notifications.length > recentNotifications.length" class="p-2 sm:p-3 border-t border-gray-200 bg-gray-50">
             <button 
               @click="viewAllNotifications"
-              class="w-full text-sm text-blue-600 hover:text-blue-500 font-medium py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors"
+              class="w-full text-xs sm:text-sm text-blue-600 hover:text-blue-500 font-medium py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors"
             >
-              View all {{ notifications.length }} notifications
+              <span class="hidden sm:inline">View all {{ notifications.length }} notifications</span>
+              <span class="sm:hidden">View all ({{ notifications.length }})</span>
             </button>
           </div>
         </div>
