@@ -290,7 +290,7 @@ async function loadRelatedEntries() {
 }
 
 async function incrementViewCount() {
-  if (!entry.value || !entry.value.isPublic || !authStore.isAuthenticated) return
+  if (!entry.value || !entry.value.id || !entry.value.isPublic || !authStore.isAuthenticated) return
 
   try {
     // Only increment view count for public entries when user is authenticated
