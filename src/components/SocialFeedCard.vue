@@ -1,166 +1,248 @@
 <template>
-  <div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 backdrop-blur-sm">
     <!-- User Header -->
-    <div class="px-6 py-4 border-b border-gray-100">
+    <div class="px-5 sm:px-6 py-4 sm:py-5 border-b border-gray-50 bg-gradient-to-r from-blue-25 to-purple-25">
       <div class="flex items-center justify-between">
         <div class="flex items-center">
-          <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-            <span class="text-sm font-medium text-indigo-700">
-              {{ entry.userInitials }}
-            </span>
+          <div class="relative">
+            <div class="h-11 w-11 sm:h-12 sm:w-12 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg ring-2 ring-white">
+              <span class="text-sm font-bold text-white">
+                {{ entry.userInitials }}
+              </span>
+            </div>
+            <div class="absolute -bottom-1 -right-1 h-4 w-4 bg-green-400 rounded-full border-2 border-white"></div>
           </div>
-          <div class="ml-3">
-            <p class="text-sm font-medium text-gray-900">{{ entry.userDisplayName }}</p>
-            <p class="text-xs text-gray-500">{{ formatDate(entry.createdAt) }}</p>
+          <div class="ml-4">
+            <p class="text-sm font-semibold text-gray-900">{{ entry.userDisplayName }}</p>
+            <p class="text-xs text-gray-600 flex items-center mt-1">
+              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+              </svg>
+              {{ formatDate(entry.createdAt) }}
+            </p>
           </div>
         </div>
         
         <!-- Privacy Badge -->
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-          <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-          </svg>
-          Public
-        </span>
+        <div class="flex items-center space-x-2">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
+            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+              <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+            </svg>
+            Public
+          </span>
+        </div>
       </div>
     </div>
 
     <!-- Content -->
-    <div class="px-6 py-4">
-      <h3 class="text-lg font-semibold text-gray-900 mb-3">Daily Reflection - {{ formatEntryDate(entry.date) }}</h3>
+    <div class="px-5 sm:px-6 py-5 sm:py-6">
+      <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-5 flex items-center">
+        <span class="text-xl sm:text-2xl mr-3">✨</span>
+        <span class="text-base sm:text-lg">{{ formatEntryDate(entry.date) }}</span>
+      </h3>
       
-      <div class="prose prose-sm max-w-none text-gray-700 space-y-3">
+      <div class="space-y-4 sm:space-y-5">
         <!-- Gratitude -->
-        <div v-if="entry.gratitude">
-          <h4 class="font-medium text-gray-900 text-sm mb-1">🙏 Gratitude</h4>
-          <p v-if="!showFullContent && entry.gratitude.length > 150">
-            {{ entry.gratitude.substring(0, 150) }}...
-            <button 
-              @click="showFullContent = true"
-              class="text-indigo-600 hover:text-indigo-700 font-medium ml-1"
-            >
-              Read more
-            </button>
-          </p>
-          <p v-else class="whitespace-pre-wrap">{{ entry.gratitude }}</p>
+        <div v-if="entry.gratitude" class="group">
+          <div class="bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-400 p-4 sm:p-5 rounded-r-xl shadow-sm hover:shadow-md transition-all duration-200">
+            <h4 class="font-semibold text-amber-900 text-sm mb-3 flex items-center">
+              <span class="text-lg sm:text-xl mr-2">🙏</span>
+              <span class="uppercase tracking-wide text-xs sm:text-sm">Gratitude</span>
+            </h4>
+            <p v-if="!showFullContent && entry.gratitude.length > 100" class="text-amber-800 text-sm sm:text-base leading-relaxed">
+              {{ entry.gratitude.substring(0, 100) }}...
+              <button 
+                @click="showFullContent = true"
+                class="text-blue-600 hover:text-blue-700 font-medium ml-2 underline decoration-2 underline-offset-2"
+              >
+                Read more
+              </button>
+            </p>
+            <p v-else class="whitespace-pre-wrap text-amber-800 text-sm sm:text-base leading-relaxed">{{ entry.gratitude }}</p>
+          </div>
         </div>
 
         <!-- Emotion -->
-        <div v-if="entry.emotion">
-          <h4 class="font-medium text-gray-900 text-sm mb-1">💭 Emotion</h4>
-          <p v-if="!showFullContent && entry.emotion.length > 150">
-            {{ entry.emotion.substring(0, 150) }}...
-            <button 
-              @click="showFullContent = true"
-              class="text-indigo-600 hover:text-indigo-700 font-medium ml-1"
-            >
-              Read more
-            </button>
-          </p>
-          <p v-else class="whitespace-pre-wrap">{{ entry.emotion }}</p>
+        <div v-if="entry.emotion" class="group">
+          <div class="bg-gradient-to-r from-purple-50 to-pink-50 border-l-4 border-purple-400 p-4 sm:p-5 rounded-r-xl shadow-sm hover:shadow-md transition-all duration-200">
+            <h4 class="font-semibold text-purple-900 text-sm mb-3 flex items-center">
+              <span class="text-lg sm:text-xl mr-2">💭</span>
+              <span class="uppercase tracking-wide text-xs sm:text-sm">Current Emotion</span>
+            </h4>
+            <p v-if="!showFullContent && entry.emotion.length > 100" class="text-purple-800 text-sm sm:text-base leading-relaxed">
+              {{ entry.emotion.substring(0, 100) }}...
+              <button 
+                @click="showFullContent = true"
+                class="text-blue-600 hover:text-blue-700 font-medium ml-2 underline decoration-2 underline-offset-2"
+              >
+                Read more
+              </button>
+            </p>
+            <p v-else class="whitespace-pre-wrap text-purple-800 text-sm sm:text-base leading-relaxed">{{ entry.emotion }}</p>
+          </div>
         </div>
 
         <!-- Challenges (if expanded) -->
-        <div v-if="showFullContent && entry.challenges">
-          <h4 class="font-medium text-gray-900 text-sm mb-1">🎯 Challenges</h4>
-          <p class="whitespace-pre-wrap">{{ entry.challenges }}</p>
+        <div v-if="showFullContent && entry.challenges" class="group">
+          <div class="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-400 p-4 sm:p-5 rounded-r-xl shadow-sm hover:shadow-md transition-all duration-200">
+            <h4 class="font-semibold text-red-900 text-sm mb-3 flex items-center">
+              <span class="text-lg sm:text-xl mr-2">🎯</span>
+              <span class="uppercase tracking-wide text-xs sm:text-sm">Challenges</span>
+            </h4>
+            <p class="whitespace-pre-wrap text-red-800 text-sm sm:text-base leading-relaxed">{{ entry.challenges }}</p>
+          </div>
         </div>
 
         <!-- Learning (if expanded) -->
-        <div v-if="showFullContent && entry.learning">
-          <h4 class="font-medium text-gray-900 text-sm mb-1">📚 Learning</h4>
-          <p class="whitespace-pre-wrap">{{ entry.learning }}</p>
+        <div v-if="showFullContent && entry.learning" class="group">
+          <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-400 p-4 sm:p-5 rounded-r-xl shadow-sm hover:shadow-md transition-all duration-200">
+            <h4 class="font-semibold text-green-900 text-sm mb-3 flex items-center">
+              <span class="text-lg sm:text-xl mr-2">📚</span>
+              <span class="uppercase tracking-wide text-xs sm:text-sm">Learning</span>
+            </h4>
+            <p class="whitespace-pre-wrap text-green-800 text-sm sm:text-base leading-relaxed">{{ entry.learning }}</p>
+          </div>
         </div>
 
-        <!-- Show more button if content is truncated -->
-        <div v-if="!showFullContent && (entry.challenges || entry.learning)">
+        <!-- Show more sections preview -->
+        <div v-if="!showFullContent && (entry.challenges || entry.learning)" class="text-center pt-2">
           <button 
             @click="showFullContent = true"
-            class="text-indigo-600 hover:text-indigo-700 font-medium text-sm"
+            class="inline-flex items-center px-5 py-3 text-sm font-medium text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-200 group border border-blue-200"
           >
-            Show full entry
+            <span>+ {{ [entry.challenges, entry.learning].filter(Boolean).length }} more section{{ [entry.challenges, entry.learning].filter(Boolean).length > 1 ? 's' : '' }}</span>
+            <svg class="w-4 h-4 ml-2 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
           </button>
         </div>
       </div>
     </div>
 
     <!-- Actions Bar -->
-    <div class="px-6 py-3 bg-gray-50 border-t border-gray-10">
-      <div class="flex flex-col gap-4">
-        <!-- Reaction Summary -->
-        <div class="flex items-center space-x-4 text-sm text-gray-500">
-          <span v-if="(entry.totalReactions || 0) > 0">
-            {{ entry.totalReactions }} {{ entry.totalReactions === 1 ? 'reaction' : 'reactions' }}
-          </span>
-          <span v-if="(entry.totalComments || 0) > 0">
-            {{ entry.totalComments }} {{ entry.totalComments === 1 ? 'comment' : 'comments' }}
-          </span>
+    <div class="px-5 sm:px-6 py-4 sm:py-5 bg-gradient-to-r from-gray-50 to-gray-100 border-t border-gray-200">
+      <div class="flex flex-col gap-4 sm:gap-5">
+        <!-- Reaction Summary and View Full Entry -->
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div class="flex items-center space-x-3 sm:space-x-4 text-sm sm:text-base text-gray-600">
+            <span v-if="(entry.totalReactions || 0) > 0" class="flex items-center space-x-2 bg-white px-4 py-2 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-200">
+              <div class="flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-red-100 to-pink-100">
+                <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.789l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"/>
+                </svg>
+              </div>
+              <span class="font-semibold text-gray-800">{{ entry.totalReactions }}</span>
+              <span class="text-xs text-gray-500 hidden sm:inline">reactions</span>
+            </span>
+            <span v-if="(entry.totalComments || 0) > 0" class="flex items-center space-x-2 bg-white px-4 py-2 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-200">
+              <div class="flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-blue-100 to-purple-100">
+                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+              </div>
+              <span class="font-semibold text-gray-800">{{ entry.totalComments }}</span>
+              <span class="text-xs text-gray-500 hidden sm:inline">comments</span>
+            </span>
+          </div>
+          
+          <!-- View Full Entry Button -->
+          <button
+            @click="viewFullEntry"
+            class="group inline-flex items-center px-5 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:scale-105 active:scale-95"
+          >
+            <span class="hidden sm:inline mr-2">✨</span>
+            <span class="hidden sm:inline">View Full Entry</span>
+            <span class="sm:hidden">View Full</span>
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+            </svg>
+          </button>
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex items-center space-x-1">
+        <div class="flex items-center space-x-2 sm:space-x-4">
           <!-- Reaction Button -->
           <div class="relative" ref="reactionDropdown">
             <button
               @click="toggleReactionDropdown"
-              class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              :class="{ 'bg-indigo-50 border-indigo-300 text-indigo-700': userHasReacted }"
+              class="flex items-center px-3 sm:px-5 py-2 sm:py-2.5 text-sm font-medium transition-all duration-200 rounded-full"
+              :class="userHasReacted 
+                ? 'bg-blue-500 text-white shadow-md hover:bg-blue-600' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
             >
-              <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-4 h-4 mr-1 sm:mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.789l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"/>
               </svg>
-              React
+              <span class="hidden sm:inline">{{ userHasReacted ? 'Liked' : 'Like' }}</span>
+              <span class="sm:hidden">{{ userHasReacted ? '❤️' : '👍' }}</span>
             </button>
 
-            <!-- Reaction Dropdown -->
+            <!-- Enhanced Reaction Dropdown -->
             <div v-if="showReactionDropdown" 
-                 class="absolute bottom-full left-0 mb-2 bg-white rounded-lg shadow-lg border border-gray-200 p-2 flex space-x-1 z-10">
-              <button
-                v-for="reaction in REACTION_TYPES"
-                :key="reaction.value"
-                @click="handleReactionClick(reaction.value)"
-                class="p-2 rounded-md hover:bg-gray-100 text-xl transition-colors duration-150"
-                :title="reaction.label"
-              >
-                {{ reaction.emoji }}
-              </button>
+                 class="absolute bottom-full left-1/2 transform -translate-x-1/2 sm:left-0 sm:transform-none mb-2 bg-white rounded-xl shadow-xl border border-gray-200 z-30">
+              <div class="flex p-2 space-x-1">
+                <button
+                  v-for="reaction in REACTION_TYPES"
+                  :key="reaction.value"
+                  @click="handleReactionClick(reaction.value)"
+                  class="p-2 sm:p-3 rounded-lg hover:bg-gray-50 text-lg sm:text-xl transition-all duration-150 hover:scale-110 active:scale-95 min-w-[40px] sm:min-w-[44px] flex items-center justify-center"
+                  :title="reaction.label"
+                >
+                  {{ reaction.emoji }}
+                </button>
+              </div>
             </div>
           </div>
 
           <!-- Comment Button -->
           <button
             @click="toggleComments"
-            class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            class="flex items-center px-3 sm:px-5 py-2 sm:py-2.5 text-sm font-medium transition-all duration-200 rounded-full"
+            :class="showComments 
+              ? 'bg-purple-500 text-white shadow-md hover:bg-purple-600' 
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
           >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
             </svg>
-            Comment
+            <span class="hidden sm:inline">{{ showComments ? 'Hide' : 'Comment' }}</span>
+            <span class="sm:hidden">💬</span>
           </button>
         </div>
       </div>
     </div>
 
     <!-- Reactions Display -->
-    <div v-if="entry.reactions && entry.reactions.length > 0" class="px-6 py-3 border-t border-gray-100">
-      <div class="flex flex-wrap gap-2">
+    <div v-if="entry.reactions && entry.reactions.length > 0" class="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200 bg-gray-50">
+      <div class="flex flex-wrap gap-2 sm:gap-3">
         <div v-for="(reactionGroup, reactionType) in groupedReactions" 
              :key="reactionType"
-             class="inline-flex items-center bg-gray-100 rounded-full px-3 py-1">
-          <span class="text-sm mr-1">{{ getReactionEmoji(reactionType) }}</span>
-          <span class="text-sm text-gray-700">{{ reactionGroup.length }}</span>
-          <div class="ml-2 flex -space-x-1">
+             class="inline-flex items-center bg-white rounded-full px-3 sm:px-4 py-2 sm:py-2.5 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200">
+          
+          <!-- Reaction Emoji -->
+          <span class="text-base sm:text-lg mr-2">{{ getReactionEmoji(reactionType) }}</span>
+          
+          <!-- Count -->
+          <span class="text-sm sm:text-base font-semibold text-gray-800 mr-2">{{ reactionGroup.length }}</span>
+          
+          <!-- User Avatars -->
+          <div class="flex -space-x-1.5 sm:-space-x-2">
             <div v-for="reaction in reactionGroup.slice(0, 3)" 
                  :key="reaction.id"
-                 class="h-4 w-4 rounded-full bg-indigo-100 flex items-center justify-center border border-white">
-              <span class="text-xs text-indigo-700">
-                {{ reaction.userDisplayName[0] }}
+                 class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center border-2 border-white shadow-sm hover:scale-110 hover:z-10 transition-all duration-200"
+                 :title="reaction.userDisplayName">
+              <span class="text-xs font-bold text-white">
+                {{ reaction.userDisplayName.split(' ').map(n => n[0]).join('').substring(0, 1) }}
               </span>
             </div>
+            
+            <!-- More users indicator -->
             <div v-if="reactionGroup.length > 3"
-                 class="h-4 w-4 rounded-full bg-gray-200 flex items-center justify-center border border-white">
-              <span class="text-xs text-gray-600">+{{ reactionGroup.length - 3 }}</span>
+                 class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gray-400 flex items-center justify-center border-2 border-white shadow-sm"
+                 :title="`+${reactionGroup.length - 3} more`">
+              <span class="text-xs font-bold text-white">+{{ reactionGroup.length - 3 }}</span>
             </div>
           </div>
         </div>
@@ -170,10 +252,10 @@
     <!-- Comments Section -->
     <div v-if="showComments" class="border-t border-gray-100">
       <!-- Add Comment Form -->
-      <div class="px-6 py-4 bg-gray-50">
-        <div class="flex space-x-3">
-          <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-            <span class="text-xs font-medium text-indigo-700">
+      <div class="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
+        <div class="flex space-x-2 sm:space-x-3">
+          <div class="h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+            <span class="text-xs font-bold text-white">
               {{ authStore.userDisplayName.split(' ').map(n => n[0]).join('') }}
             </span>
           </div>
@@ -182,7 +264,7 @@
               v-model="newComment"
               placeholder="Write a comment..."
               rows="2"
-              class="form-textarea"
+              class="w-full text-sm sm:text-base border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               @keydown.meta.enter="submitComment"
               @keydown.ctrl.enter="submitComment"
             ></textarea>
@@ -191,7 +273,7 @@
               <button
                 @click="submitComment"
                 :disabled="!newComment.trim() || isSubmittingComment"
-                class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
               >
                 {{ isSubmittingComment ? 'Posting...' : 'Post' }}
               </button>
@@ -201,18 +283,18 @@
       </div>
 
       <!-- Comments List -->
-      <div v-if="entry.comments && entry.comments.length > 0" class="px-6 py-4 space-y-4">
-        <div v-for="comment in sortedComments" :key="comment.id" class="flex space-x-3">
-          <div class="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+      <div v-if="entry.comments && entry.comments.length > 0" class="px-4 sm:px-6 py-3 sm:py-4 space-y-3 sm:space-y-4">
+        <div v-for="comment in sortedComments" :key="comment.id" class="flex space-x-2 sm:space-x-3">
+          <div class="h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
             <span class="text-xs font-medium text-gray-700">
               {{ comment.userInitials }}
             </span>
           </div>
-          <div class="flex-1">
+          <div class="flex-1 min-w-0">
             <div class="bg-gray-100 rounded-lg px-3 py-2">
-              <div class="flex justify-between items-start">
-                <p class="text-sm font-medium text-gray-900">{{ comment.userDisplayName }}</p>
-                <div class="flex items-center space-x-2">
+              <div class="flex justify-between items-start mb-1">
+                <p class="text-xs sm:text-sm font-medium text-gray-900 truncate">{{ comment.userDisplayName }}</p>
+                <div class="flex items-center space-x-2 ml-2 flex-shrink-0">
                   <span class="text-xs text-gray-500">{{ formatDate(comment.createdAt) }}</span>
                   <button
                     v-if="comment.userId === authStore.user?.uid"
@@ -223,20 +305,30 @@
                   </button>
                 </div>
               </div>
-              <p class="text-sm text-gray-700 mt-1 whitespace-pre-wrap">{{ comment.content }}</p>
+              <p class="text-xs sm:text-sm text-gray-700 whitespace-pre-wrap break-words">{{ comment.content }}</p>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Toast Notification -->
+    <Toast 
+      :show="showToast" 
+      :message="toastMessage" 
+      :type="toastType"
+      @close="showToast = false" 
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import type { JournalEntry } from '@/types/journal'
 import { REACTION_TYPES } from '@/types/journal'
 import { useAuthStore } from '@/stores/auth'
+import Toast from './Toast.vue'
 
 interface Props {
   entry: JournalEntry
@@ -252,6 +344,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const authStore = useAuthStore()
+const router = useRouter()
 
 // Reactive state
 const showFullContent = ref(false)
@@ -260,6 +353,9 @@ const showComments = ref(false)
 const newComment = ref('')
 const isSubmittingComment = ref(false)
 const reactionDropdown = ref<HTMLElement>()
+const showToast = ref(false)
+const toastMessage = ref('')
+const toastType = ref<'success' | 'error' | 'info'>('info')
 
 // Computed properties
 const userHasReacted = computed(() => {
@@ -366,6 +462,22 @@ function deleteComment(commentId: string) {
     entryId: props.entry.id!,
     commentId
   })
+}
+
+function viewFullEntry() {
+  // Navigate to the full entry page
+  router.push(`/entry/${props.entry.id}`)
+}
+
+function showToastMessage(message: string, type: 'success' | 'error' | 'info' = 'info') {
+  toastMessage.value = message
+  toastType.value = type
+  showToast.value = true
+  
+  // Auto-hide after 3 seconds
+  setTimeout(() => {
+    showToast.value = false
+  }, 3000)
 }
 
 // Click outside handler for reaction dropdown

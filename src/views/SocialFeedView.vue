@@ -3,7 +3,7 @@
     <!-- Header -->
     <MoodStoriesHeader />
     
-    <div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <!-- Error State -->
       <div v-if="socialStore.error" class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
         <div class="flex">
@@ -53,21 +53,22 @@
       </div>
 
       <!-- Feed Content -->
-      <div v-else class="space-y-6">
+      <div v-else class="space-y-4 sm:space-y-6">
         <!-- Feed Stats -->
-        <div v-if="socialStore.publicEntries.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div class="flex items-center justify-between text-sm text-gray-600">
+        <div v-if="socialStore.publicEntries.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
+          <div class="flex items-center justify-between text-xs sm:text-sm text-gray-600">
             <div class="flex items-center space-x-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h4a1 1 0 011 1v1a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1h4zM7 8v10a2 2 0 002 2h6a2 2 0 002-2V8M10 12h4"/>
               </svg>
               <span>{{ socialStore.publicEntries.length }} {{ socialStore.publicEntries.length === 1 ? 'story' : 'stories' }} loaded</span>
             </div>
             <div v-if="socialStore.hasMore" class="flex items-center space-x-1 text-blue-600">
-              <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-              <span>More available</span>
+              <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-400 rounded-full animate-pulse"></div>
+              <span class="hidden sm:inline">More available</span>
+              <span class="sm:hidden">More</span>
             </div>
-            <div v-else class="text-green-600">
+            <div v-else class="text-green-600 text-xs sm:text-sm">
               ✓ All caught up!
             </div>
           </div>
@@ -129,9 +130,9 @@
       <button
         v-if="showScrollToTop"
         @click="scrollToTop"
-        class="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 group"
+        class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 sm:p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 group touch-manipulation"
       >
-        <svg class="w-5 h-5 transform group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
         </svg>
       </button>
