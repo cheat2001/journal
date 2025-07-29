@@ -198,6 +198,20 @@
           </svg>
           <span class="text-xs sm:text-sm">{{ showComments ? 'Hide' : 'Comment' }}</span>
         </button>
+
+        <!-- Enhanced Start Chat Button -->
+        <button
+          v-if="entry.userId !== authStore.user?.uid"
+          @click="startChat"
+          :disabled="isStartingChat"
+          class="flex items-center px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-base font-semibold transition-all duration-200 rounded-lg border-2 shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-emerald-500 to-green-600 text-white border-emerald-500 hover:from-emerald-600 hover:to-green-700 hover:border-emerald-600 shadow-emerald-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <svg class="w-3 h-3 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 7a4 4 0 118 0v0a5.5 5.5 0 01-5.5 5.5v0H9a4 4 0 01-4-4v0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+          </svg>
+          <span class="text-xs sm:text-sm">{{ isStartingChat ? 'Starting...' : 'Start Chat' }}</span>
+        </button>
       </div>
     </div>
 
@@ -346,6 +360,8 @@ import { useRouter } from 'vue-router'
 import type { JournalEntry } from '@/types/journal'
 import { REACTION_TYPES } from '@/types/journal'
 import { useAuthStore } from '@/stores/auth'
+import { useChatStore } from '@/stores/chat'
+import { notificationSound } from '@/utils/notificationSound'
 import Toast from './Toast.vue'
 
 interface Props {
@@ -362,6 +378,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const authStore = useAuthStore()
+const chatStore = useChatStore()
 const router = useRouter()
 
 // Reactive state
@@ -374,6 +391,7 @@ const reactionDropdown = ref<HTMLElement>()
 const showToast = ref(false)
 const toastMessage = ref('')
 const toastType = ref<'success' | 'error' | 'info'>('info')
+const isStartingChat = ref(false)
 
 // Computed properties
 const userHasReacted = computed(() => {
@@ -487,6 +505,32 @@ function viewFullEntry() {
   router.push(`/entry/${props.entry.id}`)
 }
 
+async function startChat() {
+  if (!authStore.user || isStartingChat.value || props.entry.userId === authStore.user.uid) return
+  
+  isStartingChat.value = true
+  
+  try {
+    const chatRoomId = await chatStore.getOrCreateChatRoom(
+      props.entry.userId,
+      props.entry.userDisplayName || 'Unknown User'
+    )
+    
+    // Play new chat notification sound
+    await notificationSound.playNewChatNotification(props.entry.userDisplayName || 'Unknown User')
+    
+    // Navigate to chat room
+    router.push(`/chat/${chatRoomId}`)
+    
+    showToastMessage('Chat started successfully!', 'success')
+  } catch (error) {
+    console.error('Error starting chat:', error)
+    showToastMessage('Failed to start chat. Please try again.', 'error')
+  } finally {
+    isStartingChat.value = false
+  }
+}
+
 function showToastMessage(message: string, type: 'success' | 'error' | 'info' = 'info') {
   toastMessage.value = message
   toastType.value = type
@@ -557,6 +601,10 @@ onUnmounted(() => {
 
 .shadow-purple-200 {
   box-shadow: 0 4px 6px -1px rgba(147, 51, 234, 0.1), 0 2px 4px -1px rgba(147, 51, 234, 0.06);
+}
+
+.shadow-emerald-200 {
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.1), 0 2px 4px -1px rgba(16, 185, 129, 0.06);
 }
 
 .shadow-gray-200 {

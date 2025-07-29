@@ -281,6 +281,65 @@ service cloud.firestore {
       allow read, write: if isAuthenticated() && isOwner(userId);
     }
 
+    // Chat Rooms Collection
+    match /chat-rooms/{chatRoomId} {
+      // Participants can read chat rooms they're part of
+      allow read: if isAuthenticated() && 
+                     request.auth.uid in resource.data.participants;
+      
+      // Authenticated users can create chat rooms with themselves as participants
+      allow create: if isAuthenticated() && 
+                       request.auth.uid in request.resource.data.participants &&
+                       request.resource.data.participants is list &&
+                       request.resource.data.participants.size() >= 2 &&
+                       request.resource.data.participantNames is list &&
+                       request.resource.data.participantInitials is list &&
+                       request.resource.data.chatType == 'direct' &&
+                       request.resource.data.isActive == true;
+      
+      // Participants can update chat rooms (mainly for lastMessage)
+      allow update: if isAuthenticated() && 
+                       request.auth.uid in resource.data.participants;
+      
+      // Participants can soft-delete chat rooms (set isActive to false)
+      allow delete: if isAuthenticated() && 
+                       request.auth.uid in resource.data.participants;
+    }
+
+    // Chat Messages Collection
+    match /chat-messages/{messageId} {
+      // Function to check if user is participant in the chat room
+      function isParticipantInRoom(chatRoomId) {
+        return exists(/databases/$(database)/documents/chat-rooms/$(chatRoomId)) &&
+               request.auth.uid in get(/databases/$(database)/documents/chat-rooms/$(chatRoomId)).data.participants;
+      }
+      
+      // Participants can read messages from their chat rooms
+      allow read: if isAuthenticated() && 
+                     isParticipantInRoom(resource.data.chatRoomId);
+      
+      // Participants can create messages in their chat rooms
+      allow create: if isAuthenticated() && 
+                       request.resource.data.senderId == request.auth.uid &&
+                       isParticipantInRoom(request.resource.data.chatRoomId) &&
+                       request.resource.data.content is string &&
+                       request.resource.data.content.size() <= 1000 &&
+                       request.resource.data.senderName is string &&
+                       request.resource.data.senderInitials is string &&
+                       request.resource.data.messageType in ['text', 'journal-reference', 'mood-share'] &&
+                       request.resource.data.isRead is bool;
+      
+      // Message senders can update their own messages (mainly for editing)
+      allow update: if isAuthenticated() && 
+                       request.auth.uid == resource.data.senderId &&
+                       isParticipantInRoom(resource.data.chatRoomId);
+      
+      // Message senders can delete their own messages
+      allow delete: if isAuthenticated() && 
+                       request.auth.uid == resource.data.senderId &&
+                       isParticipantInRoom(resource.data.chatRoomId);
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;

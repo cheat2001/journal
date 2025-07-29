@@ -43,6 +43,24 @@
             </svg>
             Community
           </router-link>
+          
+          <router-link
+            to="/chat"
+            class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 relative"
+            :class="$route.path.startsWith('/chat') 
+              ? 'bg-emerald-100 text-emerald-700 shadow-sm' 
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+          >
+            <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 7a4 4 0 118 0v0a5.5 5.5 0 01-5.5 5.5v0H9a4 4 0 01-4-4v0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            </svg>
+            Messages
+            <!-- Unread messages indicator -->
+            <span v-if="unreadMessagesCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-lg">
+              {{ unreadMessagesCount > 9 ? '9+' : unreadMessagesCount }}
+            </span>
+          </router-link>
         </nav>
 
         <!-- Mobile Menu Button -->
@@ -124,6 +142,21 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
               </svg>
               Community Feed
+            </router-link>
+            
+            <router-link
+              to="/chat"
+              @click="showUserMenu = false"
+              class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 flex items-center transition-colors duration-150 relative"
+            >
+              <svg class="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 7a4 4 0 118 0v0a5.5 5.5 0 01-5.5 5.5v0H9a4 4 0 01-4-4v0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+              </svg>
+              Messages
+              <span v-if="unreadMessagesCount > 0" class="ml-auto bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                {{ unreadMessagesCount > 9 ? '9+' : unreadMessagesCount }}
+              </span>
             </router-link>
             
             <router-link
@@ -224,6 +257,25 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
           </svg>
           Community
+        </router-link>
+
+        <router-link
+          to="/chat"
+          @click="showMobileMenu = false"
+          class="flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 relative"
+          :class="$route.path.startsWith('/chat') 
+            ? 'bg-emerald-100 text-emerald-700 shadow-sm' 
+            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+        >
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 7a4 4 0 118 0v0a5.5 5.5 0 01-5.5 5.5v0H9a4 4 0 01-4-4v0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+          </svg>
+          Messages
+          <!-- Unread messages indicator -->
+          <span v-if="unreadMessagesCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-lg">
+            {{ unreadMessagesCount > 9 ? '9+' : unreadMessagesCount }}
+          </span>
         </router-link>
 
         <router-link
@@ -329,9 +381,11 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ChevronDownIcon, UserIcon, ArrowRightOnRectangleIcon } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
+import { useChatStore } from '@/stores/chat'
 import NotificationCenter from './NotificationCenter.vue'
 
 const authStore = useAuthStore()
+const chatStore = useChatStore()
 
 const showUserMenu = ref(false)
 const showMobileMenu = ref(false)
@@ -351,6 +405,10 @@ const userInitials = computed(() => {
     .join('')
     .toUpperCase()
     .slice(0, 2)
+})
+
+const unreadMessagesCount = computed(() => {
+  return authStore.isAuthenticated ? chatStore.unreadChatsCount : 0
 })
 
 async function handleLogout() {
@@ -389,6 +447,11 @@ function closeProfile() {
 
 onMounted(() => {
   profileForm.displayName = authStore.userDisplayName
+  
+  // Fetch chat rooms for unread count if authenticated
+  if (authStore.isAuthenticated) {
+    chatStore.fetchChatRooms().catch(console.error)
+  }
 })
 </script>
 

@@ -35,6 +35,18 @@ const router = createRouter({
       component: () => import('../views/EntryView.vue'),
       // Allow both authenticated and non-authenticated users to view public entries
     },
+    {
+      path: '/chat',
+      name: 'chat-list',
+      component: () => import('../views/ChatListView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/chat/:id',
+      name: 'chat',
+      component: () => import('../views/ChatView.vue'),
+      meta: { requiresAuth: true }
+    },
   ],
 })
 
