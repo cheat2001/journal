@@ -48,6 +48,17 @@
               </svg>
             </button>
             
+            <!-- Debug Refresh Button (temporary) -->
+            <button 
+              @click="forceRefresh"
+              class="p-2 rounded-lg hover:bg-gray-100 transition-colors text-orange-600"
+              title="Force refresh messages (debug)"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+            </button>
+            
             <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
               <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/>
@@ -291,6 +302,12 @@ function toggleSound() {
     soundEnabled.value ? 'Notification sounds enabled 🔊' : 'Notification sounds disabled 🔇',
     'info'
   )
+}
+
+function forceRefresh() {
+  console.log('ChatView: Force refreshing messages')
+  chatStore.forceRefreshMessages(chatRoomId.value)
+  showToastMessage('Messages refreshed', 'info')
 }
 
 // Watchers

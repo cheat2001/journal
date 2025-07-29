@@ -28,6 +28,7 @@ export const useChatStore = defineStore('chat', () => {
   
   const authStore = useAuthStore()
   let messagesUnsubscribe: Unsubscribe | null = null
+  let chatRoomsUnsubscribe: Unsubscribe | null = null
 
   // Computed
   const sortedChatRooms = computed(() => {
@@ -80,12 +81,53 @@ export const useChatStore = defineStore('chat', () => {
       chatRooms.value = rooms.sort((a, b) => {
         return b.updatedAt.getTime() - a.updatedAt.getTime()
       })
+
+      // Start real-time subscription for chat rooms
+      subscribeToChatRooms()
     } catch (err) {
       error.value = `Failed to fetch chat rooms: ${err instanceof Error ? err.message : 'Unknown error'}`
       console.error('Error fetching chat rooms:', err)
     } finally {
       loading.value = false
     }
+  }
+
+  function subscribeToChatRooms() {
+    if (!authStore.user || chatRoomsUnsubscribe) return
+
+    console.log('Chat store: Subscribing to chat rooms for real-time updates')
+
+    const q = query(
+      collection(db, 'chat-rooms'),
+      where('participants', 'array-contains', authStore.user.uid)
+    )
+
+    chatRoomsUnsubscribe = onSnapshot(q, (querySnapshot) => {
+      console.log('Chat store: Chat rooms updated, count:', querySnapshot.docs.length)
+      
+      const rooms = querySnapshot.docs.map(doc => {
+        const data = doc.data()
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date(),
+          lastMessage: data.lastMessage ? {
+            ...data.lastMessage,
+            timestamp: data.lastMessage.timestamp?.toDate() || new Date()
+          } : undefined
+        } as ChatRoom
+      })
+      
+      // Sort manually instead of using Firestore orderBy to avoid composite index
+      chatRooms.value = rooms.sort((a, b) => {
+        return b.updatedAt.getTime() - a.updatedAt.getTime()
+      })
+
+      console.log('Chat store: Updated unread chats count:', unreadChatsCount.value)
+    }, (error) => {
+      console.error('Chat store: Error in chat rooms subscription:', error)
+    })
   }
 
   async function getOrCreateChatRoom(otherUserId: string, otherUserName: string): Promise<string> {
@@ -204,6 +246,7 @@ export const useChatStore = defineStore('chat', () => {
 
     messagesUnsubscribe = onSnapshot(q, (querySnapshot) => {
       console.log('Chat store: Messages snapshot received, count:', querySnapshot.docs.length)
+      console.log('Chat store: Current user ID:', authStore.user?.uid)
       
       const messages = querySnapshot.docs.map(doc => {
         const data = doc.data()
@@ -227,10 +270,13 @@ export const useChatStore = defineStore('chat', () => {
         // Find the newest message(s)
         const newMessages = sortedMessages.slice(previousMessageCount)
         
+        console.log('Chat store: New messages detected in active chat room:', newMessages.length)
+        
         // Play notification sound for messages from other users
+        // Only play here since user is actively in this chat room
         newMessages.forEach(message => {
           if (message.senderId !== authStore.user?.uid) {
-            console.log('Playing notification sound for new message from:', message.senderName)
+            console.log('Chat store: Playing notification sound for new message from:', message.senderName)
             notificationSound.playMessageReceived(message.senderName)
           }
         })
@@ -300,10 +346,30 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
+  function unsubscribeFromChatRooms() {
+    if (chatRoomsUnsubscribe) {
+      chatRoomsUnsubscribe()
+      chatRoomsUnsubscribe = null
+    }
+  }
+
+  // Debug function to force refresh messages
+  function forceRefreshMessages(chatRoomId: string) {
+    console.log('Chat store: Force refreshing messages for room:', chatRoomId)
+    unsubscribeFromMessages()
+    subscribeToMessages(chatRoomId)
+  }
+
   function clearCurrentChat() {
     currentChatRoom.value = null
     currentChatMessages.value = []
     unsubscribeFromMessages()
+  }
+
+  function clearAllSubscriptions() {
+    unsubscribeFromMessages()
+    unsubscribeFromChatRooms()
+    chatRooms.value = []
   }
 
   function getOtherParticipant(room: ChatRoom) {
@@ -338,8 +404,12 @@ export const useChatStore = defineStore('chat', () => {
     loadChatRoom,
     markMessagesAsRead,
     clearCurrentChat,
+    clearAllSubscriptions,
     getOtherParticipant,
     subscribeToMessages,
-    unsubscribeFromMessages
+    subscribeToChatRooms,
+    unsubscribeFromMessages,
+    unsubscribeFromChatRooms,
+    forceRefreshMessages
   }
 })

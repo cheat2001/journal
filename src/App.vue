@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useNotificationStore } from '@/stores/notification'
+import { globalChatNotifications } from '@/utils/globalChatNotifications'
 import AuthForms from '@/components/AuthForms.vue'
 import AppHeader from '@/components/AppHeader.vue'
 import ToastNotifications from '@/components/ToastNotifications.vue'
@@ -23,9 +24,16 @@ watch(
     if (authState.isAuthenticated && !authState.loading && !notificationStore.isInitialized) {
       console.log('🔔 User authenticated, initializing notifications...')
       await notificationStore.initialize()
+      
+      // Initialize global chat notifications
+      console.log('📱 [App] Initializing global chat notifications...')
+      globalChatNotifications.initialize()
     } else if (!authState.isAuthenticated && !authState.loading && notificationStore.isInitialized) {
       console.log('🔔 User logged out, cleaning up notifications...')
       notificationStore.cleanup()
+      
+      // Stop global chat notifications
+      globalChatNotifications.cleanup()
     }
   },
   { immediate: true }
@@ -34,6 +42,7 @@ watch(
 // Cleanup notifications on unmount
 onUnmounted(() => {
   notificationStore.cleanup()
+  globalChatNotifications.cleanup()
 })
 </script>
 

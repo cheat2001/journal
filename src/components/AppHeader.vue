@@ -378,7 +378,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { ChevronDownIcon, UserIcon, ArrowRightOnRectangleIcon } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
 import { useChatStore } from '@/stores/chat'
@@ -451,6 +451,17 @@ onMounted(() => {
   // Fetch chat rooms for unread count if authenticated
   if (authStore.isAuthenticated) {
     chatStore.fetchChatRooms().catch(console.error)
+  }
+})
+
+// Watch for authentication changes to start/stop chat subscriptions
+watch(() => authStore.isAuthenticated, (isAuthenticated: boolean) => {
+  if (isAuthenticated) {
+    // Start chat rooms subscription for real-time unread count updates
+    chatStore.fetchChatRooms().catch(console.error)
+  } else {
+    // Clean up subscriptions when user logs out
+    chatStore.clearAllSubscriptions()
   }
 })
 </script>
