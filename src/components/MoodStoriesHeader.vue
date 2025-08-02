@@ -44,58 +44,66 @@
 
     <!-- Mood Modal -->
     <div v-if="showMoodModal" class="modal-overlay" @click="closeMoodModal">
-      <div class="modal-content" @click.stop>
-        <div class="modal-header">
-          <h3>Share Your Mood</h3>
+      <div class="modal-content bg-white dark:bg-gray-800" @click.stop>
+        <div class="modal-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-gray-900 dark:text-gray-100">Share Your Mood</h3>
           <button @click="closeMoodModal" class="close-btn">×</button>
         </div>
 
-        <div class="modal-body">
+        <div class="modal-body bg-white dark:bg-gray-800">
           <div class="emotions-section">
-            <label class="section-label">How are you feeling?</label>
+            <label class="section-label text-gray-700 dark:text-gray-300">How are you feeling?</label>
             <div class="emotions-grid">
               <button
                 v-for="emotion in EMOTION_OPTIONS"
                 :key="emotion.value"
                 @click="selectEmotion(emotion)"
-                class="emotion-btn"
-                :class="{ active: selectedEmotion === emotion.value }"
+                class="emotion-btn bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
+                :class="{ 
+                  'active': selectedEmotion === emotion.value,
+                  'border-blue-500 bg-blue-50 dark:bg-blue-900 dark:border-blue-400': selectedEmotion === emotion.value
+                }"
               >
                 <span class="emoji">{{ emotion.emoji }}</span>
-                <span class="name">{{ emotion.label }}</span>
+                <span class="name text-gray-700 dark:text-gray-300">{{ emotion.label }}</span>
               </button>
             </div>
           </div>
 
           <div class="message-section">
-            <label class="section-label">Message (optional)</label>
+            <label class="section-label text-gray-700 dark:text-gray-300">Message (optional)</label>
             <textarea
               v-model="customMessage"
               placeholder="What's on your mind?"
-              class="message-input"
+              class="message-input bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400"
               rows="3"
               maxlength="100"
             ></textarea>
-            <div class="char-count">{{ customMessage.length }}/100</div>
+            <div class="char-count text-gray-500 dark:text-gray-400">{{ customMessage.length }}/100</div>
           </div>
 
           <div class="privacy-section">
-            <label class="checkbox-label">
-              <input type="checkbox" v-model="isPublic" />
+            <label class="checkbox-label text-gray-700 dark:text-gray-300">
+              <input type="checkbox" v-model="isPublic" class="accent-blue-500" />
               <span class="checkmark"></span>
-              Share with community
+              <span class="text-gray-700 dark:text-gray-300">Share with community</span>
             </label>
           </div>
         </div>
 
-        <div class="modal-footer">
-          <button @click="closeMoodModal" class="btn btn-secondary">Cancel</button>
+        <div class="modal-footer bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+          <button @click="closeMoodModal" class="btn btn-secondary bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500">Cancel</button>
           <button 
             @click="saveMood" 
             :disabled="!selectedEmotion || loading"
-            class="btn btn-primary"
+            class="btn btn-primary bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600"
+            :class="{ 'opacity-50 cursor-not-allowed': !selectedEmotion || loading }"
           >
-            {{ loading ? 'Sharing...' : 'Share Mood' }}
+            <span v-if="loading" class="flex items-center gap-2">
+              <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              Sharing...
+            </span>
+            <span v-else>Share Mood</span>
           </button>
         </div>
       </div>
@@ -103,74 +111,80 @@
 
     <!-- Story Viewer Modal -->
     <div v-if="viewingStory" class="modal-overlay" @click="closeStoryViewer">
-      <div class="story-modal" @click.stop>
-        <div class="story-modal-header">
+      <div class="story-modal bg-white dark:bg-gray-800" @click.stop>
+        <div class="story-modal-header bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
           <div class="user-info">
             <div class="user-avatar" :class="getMoodColor(viewingStory.emotion)">
               <span>{{ getInitials(viewingStory.userName) }}</span>
             </div>
             <div class="user-details">
-              <h4>{{ viewingStory.userName }}</h4>
-              <p>{{ formatTimeAgo(viewingStory.createdAt) }}</p>
+              <h4 class="text-gray-900 dark:text-gray-100">{{ viewingStory.userName }}</h4>
+              <p class="text-gray-600 dark:text-gray-400">{{ formatTimeAgo(viewingStory.createdAt) }}</p>
             </div>
           </div>
-          <button @click="closeStoryViewer" class="close-btn">×</button>
+          <button @click="closeStoryViewer" class="close-btn bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500">×</button>
         </div>
 
-        <div class="story-modal-body">
+        <div class="story-modal-body bg-white dark:bg-gray-800">
           <div class="mood-display">
             <div class="big-emoji">{{ viewingStory.emoji }}</div>
             <div class="mood-text">
-              <p>Feeling <strong>{{ viewingStory.emotion }}</strong></p>
-              <p v-if="viewingStory.customMessage" class="message">
+              <p class="text-gray-600 dark:text-gray-400">Feeling <strong class="text-gray-900 dark:text-gray-100">{{ viewingStory.emotion }}</strong></p>
+              <p v-if="viewingStory.customMessage" class="message text-gray-700 dark:text-gray-300">
                 "{{ viewingStory.customMessage }}"
               </p>
             </div>
           </div>
           
           <!-- Reactions Summary -->
-          <div v-if="viewingStory.reactions && viewingStory.reactions.length > 0" class="reactions-summary">
-            <h5>{{ viewingStory.totalReactions }} {{ viewingStory.totalReactions === 1 ? 'reaction' : 'reactions' }}</h5>
+          <div v-if="viewingStory.reactions && viewingStory.reactions.length > 0" class="reactions-summary bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+            <h5 class="text-gray-700 dark:text-gray-300">{{ viewingStory.totalReactions }} {{ viewingStory.totalReactions === 1 ? 'reaction' : 'reactions' }}</h5>
             
             <!-- Detailed Reactions List -->
             <div class="reactions-list">
               <div v-for="reaction in viewingStory.reactions" :key="reaction.id" class="reaction-item">
-                <div class="reaction-user">
+                <div class="reaction-user bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600">
                   <div class="user-initials">{{ getInitials(reaction.userName) }}</div>
                   <div class="reaction-details">
-                    <span class="user-name">{{ reaction.userName }}</span>
-                    <span class="reaction-type">{{ reaction.emoji }} {{ getReactionLabel(reaction.type) }}</span>
+                    <span class="user-name text-gray-800 dark:text-gray-200">{{ reaction.userName }}</span>
+                    <span class="reaction-type text-gray-600 dark:text-gray-400">{{ reaction.emoji }} {{ getReactionLabel(reaction.type) }}</span>
                   </div>
-                  <span class="reaction-time">{{ formatTimeAgo(reaction.createdAt) }}</span>
+                  <span class="reaction-time text-gray-500 dark:text-gray-500">{{ formatTimeAgo(reaction.createdAt) }}</span>
                 </div>
               </div>
             </div>
             
             <!-- Reaction Counts Summary -->
             <div class="reaction-counts">
-              <div v-for="(count, type) in getReactionCounts(viewingStory)" :key="type" class="reaction-count">
+              <div v-for="(count, type) in getReactionCounts(viewingStory)" :key="type" class="reaction-count bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
                 <span class="count-emoji">{{ getReactionEmoji(String(type)) }}</span>
-                <span class="count-number">{{ count }}</span>
+                <span class="count-number text-gray-800 dark:text-gray-200">{{ count }}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="story-modal-footer">
+        <div class="story-modal-footer bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
           <button
             v-for="reaction in quickReactions"
             :key="reaction.value"
             @click="reactToStory(viewingStory, reaction)"
-            class="reaction-btn"
+            class="reaction-btn bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
             :class="{ 
               'loading': reactionLoading === reaction.value,
-              'user-reacted': hasUserReacted(viewingStory, reaction.value)
+              'user-reacted bg-blue-100 dark:bg-blue-900 border-blue-400 dark:border-blue-500 text-blue-800 dark:text-blue-200': hasUserReacted(viewingStory, reaction.value),
+              'opacity-50 cursor-not-allowed': reactionLoading !== null && reactionLoading !== reaction.value
             }"
             :disabled="reactionLoading !== null"
           >
             <span v-if="reactionLoading === reaction.value" class="loading-spinner"></span>
             <span v-else class="reaction-emoji">{{ reaction.emoji }}</span>
-            <span class="reaction-text">{{ reaction.label }}</span>
+            <span class="reaction-text">
+              {{ reaction.label }}
+              <span v-if="getReactionCounts(viewingStory)[reaction.value]" class="reaction-count-badge bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300">
+                {{ getReactionCounts(viewingStory)[reaction.value] }}
+              </span>
+            </span>
           </button>
         </div>
       </div>
@@ -554,7 +568,6 @@ onMounted(async () => {
 }
 
 .modal-content {
-  background: white;
   border-radius: 12px;
   width: 100%;
   max-width: 500px;
@@ -567,7 +580,6 @@ onMounted(async () => {
 }
 
 :deep(.dark) .modal-content {
-  background: #1f2937;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
 }
 
@@ -583,49 +595,22 @@ onMounted(async () => {
   align-items: center;
   justify-content: space-between;
   padding: 20px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-:deep(.dark) .modal-header {
-  border-bottom: 1px solid #374151;
 }
 
 .modal-header h3 {
   font-size: 18px;
   font-weight: 700;
-  color: #111827;
   margin: 0;
-}
-
-:deep(.dark) .modal-header h3 {
-  color: #f9fafb;
 }
 
 .close-btn {
   width: 32px;
   height: 32px;
   border: none;
-  background: #f3f4f6;
   border-radius: 50%;
   cursor: pointer;
   font-size: 20px;
-  color: #6b7280;
   transition: all 0.2s;
-}
-
-:deep(.dark) .close-btn {
-  background: #374151;
-  color: #9ca3af;
-}
-
-.close-btn:hover {
-  background: #e5e7eb;
-  color: #111827;
-}
-
-:deep(.dark) .close-btn:hover {
-  background: #4b5563;
-  color: #f9fafb;
 }
 
 .modal-body {
@@ -649,12 +634,7 @@ onMounted(async () => {
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
   margin-bottom: 12px;
-}
-
-:deep(.dark) .section-label {
-  color: #d1d5db;
 }
 
 .emotions-grid {
@@ -675,17 +655,11 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   padding: 12px 8px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid;
   border-radius: 8px;
-  background: white;
   cursor: pointer;
   transition: all 0.2s;
   min-height: 70px;
-}
-
-:deep(.dark) .emotion-btn {
-  border: 2px solid #4b5563;
-  background: #374151;
 }
 
 @media (max-width: 640px) {
@@ -697,22 +671,10 @@ onMounted(async () => {
 
 .emotion-btn:hover {
   border-color: #d1d5db;
-  background: #f9fafb;
-}
-
-:deep(.dark) .emotion-btn:hover {
-  border-color: #6b7280;
-  background: #4b5563;
 }
 
 .emotion-btn.active {
   border-color: #3b82f6;
-  background: #eff6ff;
-}
-
-:deep(.dark) .emotion-btn.active {
-  border-color: #60a5fa;
-  background: #1e3a8a;
 }
 
 .emotion-btn .emoji {
@@ -730,11 +692,6 @@ onMounted(async () => {
 .emotion-btn .name {
   font-size: 11px;
   font-weight: 500;
-  color: #374151;
-}
-
-:deep(.dark) .emotion-btn .name {
-  color: #d1d5db;
 }
 
 @media (max-width: 640px) {
@@ -751,20 +708,13 @@ onMounted(async () => {
 .message-input {
   width: 100%;
   padding: 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid;
   border-radius: 6px;
   font-size: 14px;
   resize: none;
   outline: none;
   transition: border-color 0.2s;
-  color: black;
   box-sizing: border-box;
-}
-
-:deep(.dark) .message-input {
-  border: 1px solid #4b5563;
-  background: #374151;
-  color: #f9fafb;
 }
 
 @media (max-width: 640px) {
@@ -779,20 +729,10 @@ onMounted(async () => {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-:deep(.dark) .message-input:focus {
-  border-color: #60a5fa;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
-}
-
 .char-count {
   text-align: right;
   font-size: 12px;
-  color: #6b7280;
   margin-top: 4px;
-}
-
-:deep(.dark) .char-count {
-  color: #9ca3af;
 }
 
 /* Privacy Section */
@@ -806,17 +746,13 @@ onMounted(async () => {
   gap: 8px;
   cursor: pointer;
   font-size: 14px;
-  color: #374151;
-}
-
-:deep(.dark) .checkbox-label {
-  color: #d1d5db;
 }
 
 .checkbox-label input[type="checkbox"] {
   width: 16px;
   height: 16px;
   accent-color: #3b82f6;
+  cursor: pointer;
 }
 
 /* Modal Footer */
@@ -824,19 +760,7 @@ onMounted(async () => {
   display: flex;
   gap: 12px;
   padding: 20px;
-  border-top: 1px solid #e5e7eb;
-  background: #f9fafb;
   flex-shrink: 0;
-}
-
-:deep(.dark) .modal-footer {
-  border-top: 1px solid #374151;
-  background: #111827;
-}
-
-:deep(.dark) .modal-footer {
-  border-top: 1px solid #374151;
-  background: #111827;
 }
 
 @media (max-width: 640px) {
@@ -864,54 +788,10 @@ onMounted(async () => {
   }
 }
 
-.btn-secondary {
-  background: #f3f4f6;
-  color: #374151;
-}
-
-:deep(.dark) .btn-secondary {
-  background: #4b5563;
-  color: #d1d5db;
-}
-
-.btn-secondary:hover {
-  background: #e5e7eb;
-}
-
-:deep(.dark) .btn-secondary:hover {
-  background: #6b7280;
-}
-
-.btn-primary {
-  background: #3b82f6;
-  color: white;
-}
-
-:deep(.dark) .btn-primary {
-  background: #2563eb;
-  color: #f9fafb;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #2563eb;
-}
-
-:deep(.dark) .btn-primary:hover:not(:disabled) {
-  background: #1d4ed8;
-}
-
-.btn-primary:disabled {
-  background: #9ca3af;
-  cursor: not-allowed;
-}
-
-:deep(.dark) .btn-primary:disabled {
-  background: #6b7280;
-}
+/* Button styles handled by Tailwind classes */
 
 /* Story Modal */
 .story-modal {
-  background: white;
   border-radius: 12px;
   width: 100%;
   max-width: 400px;
@@ -920,7 +800,6 @@ onMounted(async () => {
 }
 
 :deep(.dark) .story-modal {
-  background: #1f2937;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
 }
 
@@ -929,13 +808,6 @@ onMounted(async () => {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-:deep(.dark) .story-modal-header {
-  background: #111827;
-  border-bottom: 1px solid #374151;
 }
 
 .user-info {
@@ -961,22 +833,12 @@ onMounted(async () => {
 .user-details h4 {
   font-size: 14px;
   font-weight: 600;
-  color: #111827;
   margin: 0;
-}
-
-:deep(.dark) .user-details h4 {
-  color: #f9fafb;
 }
 
 .user-details p {
   font-size: 12px;
-  color: #6b7280;
   margin: 2px 0 0;
-}
-
-:deep(.dark) .user-details p {
-  color: #9ca3af;
 }
 
 .story-modal-body {
@@ -997,48 +859,26 @@ onMounted(async () => {
 
 .mood-text p {
   font-size: 16px;
-  color: #6b7280;
   margin: 0;
-}
-
-:deep(.dark) .mood-text p {
-  color: #9ca3af;
 }
 
 .mood-text .message {
   font-size: 14px;
-  color: #374151;
   font-style: italic;
   margin-top: 8px;
-}
-
-:deep(.dark) .mood-text .message {
-  color: #d1d5db;
 }
 
 /* Reactions Summary */
 .reactions-summary {
   margin-top: 24px;
   padding: 16px;
-  background: #f8fafc;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-:deep(.dark) .reactions-summary {
-  background: #374151;
-  border: 1px solid #4b5563;
 }
 
 .reactions-summary h5 {
   font-size: 14px;
   font-weight: 600;
-  color: #475569;
   margin: 0 0 12px 0;
-}
-
-:deep(.dark) .reactions-summary h5 {
-  color: #d1d5db;
 }
 
 .reactions-list {
@@ -1056,14 +896,8 @@ onMounted(async () => {
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  background: white;
   border-radius: 6px;
-  border: 1px solid #e2e8f0;
-}
-
-:deep(.dark) .reaction-user {
-  background: #1f2937;
-  border: 1px solid #4b5563;
+  border: 1px solid;
 }
 
 .user-initials {
@@ -1090,30 +924,15 @@ onMounted(async () => {
 .user-name {
   font-size: 13px;
   font-weight: 600;
-  color: #374151;
-}
-
-:deep(.dark) .user-name {
-  color: #d1d5db;
 }
 
 .reaction-type {
   font-size: 12px;
-  color: #6b7280;
-}
-
-:deep(.dark) .reaction-type {
-  color: #9ca3af;
 }
 
 .reaction-time {
   font-size: 11px;
-  color: #9ca3af;
   flex-shrink: 0;
-}
-
-:deep(.dark) .reaction-time {
-  color: #6b7280;
 }
 
 .reaction-counts {
@@ -1127,15 +946,9 @@ onMounted(async () => {
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
-  background: white;
-  border: 1px solid #d1d5db;
+  border: 1px solid;
   border-radius: 16px;
   font-size: 12px;
-}
-
-:deep(.dark) .reaction-count {
-  background: #1f2937;
-  border: 1px solid #4b5563;
 }
 
 .count-emoji {
@@ -1144,92 +957,35 @@ onMounted(async () => {
 
 .count-number {
   font-weight: 600;
-  color: #374151;
-}
-
-:deep(.dark) .count-number {
-  color: #d1d5db;
 }
 
 .story-modal-footer {
   display: flex;
   gap: 8px;
   padding: 16px 20px;
-  background: #f9fafb;
-  border-top: 1px solid #e5e7eb;
-}
-
-:deep(.dark) .story-modal-footer {
-  background: #111827;
-  border-top: 1px solid #374151;
 }
 
 .reaction-btn {
   flex: 1;
   padding: 10px 14px;
-  background: linear-gradient(135deg, #ffffff, #f8fafc);
-  border: 2px solid #e2e8f0;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: #334155;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
 }
 
-:deep(.dark) .reaction-btn {
-  background: linear-gradient(135deg, #374151, #4b5563);
-  border: 2px solid #4b5563;
-  color: #f9fafb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
 .reaction-btn:hover {
-  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-  border-color: #64748b;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  color: #1e293b;
-}
-
-:deep(.dark) .reaction-btn:hover {
-  background: linear-gradient(135deg, #4b5563, #6b7280);
-  border-color: #6b7280;
-  color: #f9fafb;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .reaction-btn.loading {
   opacity: 0.7;
   cursor: not-allowed;
-}
-
-.reaction-btn.user-reacted {
-  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-  border-color: #3b82f6;
-  color: #1e40af;
-}
-
-:deep(.dark) .reaction-btn.user-reacted {
-  background: linear-gradient(135deg, #1e3a8a, #1e40af);
-  border-color: #60a5fa;
-  color: #bfdbfe;
-}
-
-.reaction-btn.user-reacted:hover {
-  background: linear-gradient(135deg, #bfdbfe, #93c5fd);
-  border-color: #2563eb;
-}
-
-:deep(.dark) .reaction-btn.user-reacted:hover {
-  background: linear-gradient(135deg, #1e40af, #2563eb);
-  border-color: #93c5fd;
-  color: #dbeafe;
 }
 
 .reaction-btn:disabled {
@@ -1245,6 +1001,11 @@ onMounted(async () => {
   border-top: 2px solid #3b82f6;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+
+:deep(.dark) .loading-spinner {
+  border: 2px solid #4b5563;
+  border-top: 2px solid #60a5fa;
 }
 
 @keyframes spin {
@@ -1271,5 +1032,17 @@ onMounted(async () => {
 .reaction-text {
   font-size: 13px;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.reaction-count-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
 }
 </style>
