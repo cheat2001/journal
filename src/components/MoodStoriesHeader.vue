@@ -1,14 +1,17 @@
 <template>
-  <div class="mood-stories-wrapper">
-    <div class="stories-header">
-      <div class="header-info">
-        <h2 class="title">Community Mood Stories</h2>
-        <span class="count">{{ publicMoodStories.length }} people shared today</span>
-      </div>
+  <div class="py-6 px-3 sm:px-4 bg-white dark:bg-gray-900 border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm">
+    <div class="max-w-4xl mx-auto">
+      <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200/60 dark:border-gray-700/60 shadow-sm hover:shadow-md transition-all duration-300 p-5">
+        <div class="flex items-center gap-3 mb-5 p-4 bg-gradient-to-r from-gray-50 to-blue-50/30 dark:from-gray-700 dark:to-gray-600 rounded-lg border border-gray-200/50 dark:border-gray-600/50">
+          <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 m-0">Community Mood Stories</h2>
+          <span class="text-sm font-medium text-gray-600 dark:text-gray-300 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-600 dark:to-gray-700 px-4 py-2 rounded-full border border-gray-200 dark:border-gray-600 shadow-sm">
+            {{ publicMoodStories.length }} people shared today
+          </span>
+        </div>
       
-      <div class="stories-grid">
-        <!-- Add Mood Button -->
-        <div class="story-card add-story" @click="openMoodModal">
+        <div class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-4 max-h-80 overflow-y-auto">
+          <!-- Add Mood Button -->
+          <div class="story-card add-story" @click="openMoodModal">
           <div class="add-icon">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -37,6 +40,7 @@
         </div>
       </div>
     </div>
+  </div>
 
     <!-- Mood Modal -->
     <div v-if="showMoodModal" class="modal-overlay" @click="closeMoodModal">
@@ -376,50 +380,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Main Container */
-.mood-stories-wrapper {
-  margin-bottom: 2rem;
-}
-
-/* Header */
-.stories-header {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
-}
-
-.header-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #111827;
-  margin: 0;
-}
-
-.count {
-  font-size: 14px;
-  color: #6b7280;
-  background: #f3f4f6;
-  padding: 4px 12px;
-  border-radius: 20px;
-}
-
-/* Stories Grid */
-.stories-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 16px;
-  max-height: 300px;
-  overflow-y: auto;
-}
+/* Story Card Styles - keeping CSS for complex hover states */
 
 .story-card {
   display: flex;
@@ -451,10 +412,21 @@ onMounted(async () => {
   transition: all 0.2s;
 }
 
+:deep(.dark) .add-icon {
+  border: 2px dashed #6b7280;
+  color: #9ca3af;
+}
+
 .add-story:hover .add-icon {
   border-color: #3b82f6;
   color: #3b82f6;
   background: #eff6ff;
+}
+
+:deep(.dark) .add-story:hover .add-icon {
+  border-color: #60a5fa;
+  color: #60a5fa;
+  background: #1e3a8a;
 }
 
 /* User Story */
@@ -509,6 +481,12 @@ onMounted(async () => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+:deep(.dark) .mood-emoji {
+  background: #1f2937;
+  border: 2px solid #1f2937;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 .reaction-indicator {
   position: absolute;
   top: -6px;
@@ -527,6 +505,11 @@ onMounted(async () => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+:deep(.dark) .reaction-indicator {
+  border: 2px solid #1f2937;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 .story-label {
   font-size: 12px;
   color: #6b7280;
@@ -536,6 +519,10 @@ onMounted(async () => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+:deep(.dark) .story-label {
+  color: #9ca3af;
 }
 
 /* Modal Styles */
@@ -579,6 +566,11 @@ onMounted(async () => {
   margin: auto;
 }
 
+:deep(.dark) .modal-content {
+  background: #1f2937;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+}
+
 @media (max-width: 640px) {
   .modal-content {
     max-height: calc(100vh - 20px);
@@ -594,11 +586,19 @@ onMounted(async () => {
   border-bottom: 1px solid #e5e7eb;
 }
 
+:deep(.dark) .modal-header {
+  border-bottom: 1px solid #374151;
+}
+
 .modal-header h3 {
   font-size: 18px;
   font-weight: 700;
   color: #111827;
   margin: 0;
+}
+
+:deep(.dark) .modal-header h3 {
+  color: #f9fafb;
 }
 
 .close-btn {
@@ -613,9 +613,19 @@ onMounted(async () => {
   transition: all 0.2s;
 }
 
+:deep(.dark) .close-btn {
+  background: #374151;
+  color: #9ca3af;
+}
+
 .close-btn:hover {
   background: #e5e7eb;
   color: #111827;
+}
+
+:deep(.dark) .close-btn:hover {
+  background: #4b5563;
+  color: #f9fafb;
 }
 
 .modal-body {
@@ -641,6 +651,10 @@ onMounted(async () => {
   font-weight: 600;
   color: #374151;
   margin-bottom: 12px;
+}
+
+:deep(.dark) .section-label {
+  color: #d1d5db;
 }
 
 .emotions-grid {
@@ -669,6 +683,11 @@ onMounted(async () => {
   min-height: 70px;
 }
 
+:deep(.dark) .emotion-btn {
+  border: 2px solid #4b5563;
+  background: #374151;
+}
+
 @media (max-width: 640px) {
   .emotion-btn {
     padding: 8px 4px;
@@ -681,9 +700,19 @@ onMounted(async () => {
   background: #f9fafb;
 }
 
+:deep(.dark) .emotion-btn:hover {
+  border-color: #6b7280;
+  background: #4b5563;
+}
+
 .emotion-btn.active {
   border-color: #3b82f6;
   background: #eff6ff;
+}
+
+:deep(.dark) .emotion-btn.active {
+  border-color: #60a5fa;
+  background: #1e3a8a;
 }
 
 .emotion-btn .emoji {
@@ -702,6 +731,10 @@ onMounted(async () => {
   font-size: 11px;
   font-weight: 500;
   color: #374151;
+}
+
+:deep(.dark) .emotion-btn .name {
+  color: #d1d5db;
 }
 
 @media (max-width: 640px) {
@@ -728,6 +761,12 @@ onMounted(async () => {
   box-sizing: border-box;
 }
 
+:deep(.dark) .message-input {
+  border: 1px solid #4b5563;
+  background: #374151;
+  color: #f9fafb;
+}
+
 @media (max-width: 640px) {
   .message-input {
     padding: 10px;
@@ -740,11 +779,20 @@ onMounted(async () => {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+:deep(.dark) .message-input:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+}
+
 .char-count {
   text-align: right;
   font-size: 12px;
   color: #6b7280;
   margin-top: 4px;
+}
+
+:deep(.dark) .char-count {
+  color: #9ca3af;
 }
 
 /* Privacy Section */
@@ -761,6 +809,10 @@ onMounted(async () => {
   color: #374151;
 }
 
+:deep(.dark) .checkbox-label {
+  color: #d1d5db;
+}
+
 .checkbox-label input[type="checkbox"] {
   width: 16px;
   height: 16px;
@@ -775,6 +827,16 @@ onMounted(async () => {
   border-top: 1px solid #e5e7eb;
   background: #f9fafb;
   flex-shrink: 0;
+}
+
+:deep(.dark) .modal-footer {
+  border-top: 1px solid #374151;
+  background: #111827;
+}
+
+:deep(.dark) .modal-footer {
+  border-top: 1px solid #374151;
+  background: #111827;
 }
 
 @media (max-width: 640px) {
@@ -807,8 +869,17 @@ onMounted(async () => {
   color: #374151;
 }
 
+:deep(.dark) .btn-secondary {
+  background: #4b5563;
+  color: #d1d5db;
+}
+
 .btn-secondary:hover {
   background: #e5e7eb;
+}
+
+:deep(.dark) .btn-secondary:hover {
+  background: #6b7280;
 }
 
 .btn-primary {
@@ -816,13 +887,26 @@ onMounted(async () => {
   color: white;
 }
 
+:deep(.dark) .btn-primary {
+  background: #2563eb;
+  color: #f9fafb;
+}
+
 .btn-primary:hover:not(:disabled) {
   background: #2563eb;
+}
+
+:deep(.dark) .btn-primary:hover:not(:disabled) {
+  background: #1d4ed8;
 }
 
 .btn-primary:disabled {
   background: #9ca3af;
   cursor: not-allowed;
+}
+
+:deep(.dark) .btn-primary:disabled {
+  background: #6b7280;
 }
 
 /* Story Modal */
@@ -835,6 +919,11 @@ onMounted(async () => {
   overflow: hidden;
 }
 
+:deep(.dark) .story-modal {
+  background: #1f2937;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+}
+
 .story-modal-header {
   display: flex;
   align-items: center;
@@ -842,6 +931,11 @@ onMounted(async () => {
   padding: 16px 20px;
   background: #f9fafb;
   border-bottom: 1px solid #e5e7eb;
+}
+
+:deep(.dark) .story-modal-header {
+  background: #111827;
+  border-bottom: 1px solid #374151;
 }
 
 .user-info {
@@ -871,10 +965,18 @@ onMounted(async () => {
   margin: 0;
 }
 
+:deep(.dark) .user-details h4 {
+  color: #f9fafb;
+}
+
 .user-details p {
   font-size: 12px;
   color: #6b7280;
   margin: 2px 0 0;
+}
+
+:deep(.dark) .user-details p {
+  color: #9ca3af;
 }
 
 .story-modal-body {
@@ -899,11 +1001,19 @@ onMounted(async () => {
   margin: 0;
 }
 
+:deep(.dark) .mood-text p {
+  color: #9ca3af;
+}
+
 .mood-text .message {
   font-size: 14px;
   color: #374151;
   font-style: italic;
   margin-top: 8px;
+}
+
+:deep(.dark) .mood-text .message {
+  color: #d1d5db;
 }
 
 /* Reactions Summary */
@@ -915,11 +1025,20 @@ onMounted(async () => {
   border: 1px solid #e2e8f0;
 }
 
+:deep(.dark) .reactions-summary {
+  background: #374151;
+  border: 1px solid #4b5563;
+}
+
 .reactions-summary h5 {
   font-size: 14px;
   font-weight: 600;
   color: #475569;
   margin: 0 0 12px 0;
+}
+
+:deep(.dark) .reactions-summary h5 {
+  color: #d1d5db;
 }
 
 .reactions-list {
@@ -940,6 +1059,11 @@ onMounted(async () => {
   background: white;
   border-radius: 6px;
   border: 1px solid #e2e8f0;
+}
+
+:deep(.dark) .reaction-user {
+  background: #1f2937;
+  border: 1px solid #4b5563;
 }
 
 .user-initials {
@@ -969,15 +1093,27 @@ onMounted(async () => {
   color: #374151;
 }
 
+:deep(.dark) .user-name {
+  color: #d1d5db;
+}
+
 .reaction-type {
   font-size: 12px;
   color: #6b7280;
+}
+
+:deep(.dark) .reaction-type {
+  color: #9ca3af;
 }
 
 .reaction-time {
   font-size: 11px;
   color: #9ca3af;
   flex-shrink: 0;
+}
+
+:deep(.dark) .reaction-time {
+  color: #6b7280;
 }
 
 .reaction-counts {
@@ -997,6 +1133,11 @@ onMounted(async () => {
   font-size: 12px;
 }
 
+:deep(.dark) .reaction-count {
+  background: #1f2937;
+  border: 1px solid #4b5563;
+}
+
 .count-emoji {
   font-size: 14px;
 }
@@ -1006,12 +1147,21 @@ onMounted(async () => {
   color: #374151;
 }
 
+:deep(.dark) .count-number {
+  color: #d1d5db;
+}
+
 .story-modal-footer {
   display: flex;
   gap: 8px;
   padding: 16px 20px;
   background: #f9fafb;
   border-top: 1px solid #e5e7eb;
+}
+
+:deep(.dark) .story-modal-footer {
+  background: #111827;
+  border-top: 1px solid #374151;
 }
 
 .reaction-btn {
@@ -1032,12 +1182,26 @@ onMounted(async () => {
   gap: 6px;
 }
 
+:deep(.dark) .reaction-btn {
+  background: linear-gradient(135deg, #374151, #4b5563);
+  border: 2px solid #4b5563;
+  color: #f9fafb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
 .reaction-btn:hover {
   background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
   border-color: #64748b;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   color: #1e293b;
+}
+
+:deep(.dark) .reaction-btn:hover {
+  background: linear-gradient(135deg, #4b5563, #6b7280);
+  border-color: #6b7280;
+  color: #f9fafb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .reaction-btn.loading {
@@ -1051,9 +1215,21 @@ onMounted(async () => {
   color: #1e40af;
 }
 
+:deep(.dark) .reaction-btn.user-reacted {
+  background: linear-gradient(135deg, #1e3a8a, #1e40af);
+  border-color: #60a5fa;
+  color: #bfdbfe;
+}
+
 .reaction-btn.user-reacted:hover {
   background: linear-gradient(135deg, #bfdbfe, #93c5fd);
   border-color: #2563eb;
+}
+
+:deep(.dark) .reaction-btn.user-reacted:hover {
+  background: linear-gradient(135deg, #1e40af, #2563eb);
+  border-color: #93c5fd;
+  color: #dbeafe;
 }
 
 .reaction-btn:disabled {

@@ -82,14 +82,14 @@ async function handleForgotPassword() {
   <div class="w-full">
     <!-- Header -->
     <div class="text-center mb-8">
-      <h2 class="text-2xl font-bold text-gray-900 mb-2">Welcome back</h2>
-      <p class="text-gray-600">Sign in to continue your journey</p>
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Welcome back</h2>
+      <p class="text-gray-600 dark:text-gray-400">Sign in to continue your journey</p>
     </div>
 
     <form @submit.prevent="handleSignIn" class="space-y-6">
       <!-- Email Field -->
       <div>
-        <label for="signin-email" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="signin-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Email address
         </label>
         <input
@@ -104,12 +104,12 @@ async function handleForgotPassword() {
           placeholder="Enter your email address"
           @blur="showValidation = true"
         />
-        <p v-if="emailError" class="mt-1 text-sm text-red-600">{{ emailError }}</p>
+        <p v-if="emailError" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ emailError }}</p>
       </div>
 
       <!-- Password Field -->
       <div>
-        <label for="signin-password" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="signin-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Password
         </label>
         <input
@@ -124,7 +124,7 @@ async function handleForgotPassword() {
           placeholder="Enter your password"
           @blur="showValidation = true"
         />
-        <p v-if="passwordError" class="mt-1 text-sm text-red-600">{{ passwordError }}</p>
+        <p v-if="passwordError" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ passwordError }}</p>
       </div>
 
       <!-- Remember Me & Forgot Password -->
@@ -134,16 +134,16 @@ async function handleForgotPassword() {
             id="remember-me"
             v-model="form.rememberMe"
             type="checkbox"
-            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700"
           />
-          <label for="remember-me" class="ml-2 block text-sm text-gray-700">
+          <label for="remember-me" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
             Remember me
           </label>
         </div>
         <button
           type="button"
           @click="handleForgotPassword"
-          class="text-sm text-blue-600 hover:text-blue-500 font-medium"
+          class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 font-medium"
           :class="{ 'opacity-50 cursor-not-allowed': !form.email.trim() }"
           :disabled="authStore.loading"
         >
@@ -152,7 +152,7 @@ async function handleForgotPassword() {
       </div>
 
       <!-- Error Message -->
-      <div v-if="authStore.error" class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+      <div v-if="authStore.error" class="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
         {{ authStore.error }}
       </div>
 
@@ -170,10 +170,10 @@ async function handleForgotPassword() {
       <!-- Divider -->
       <div class="relative">
         <div class="absolute inset-0 flex items-center">
-          <div class="w-full border-t border-gray-300"></div>
+          <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
         </div>
         <div class="relative flex justify-center text-sm">
-          <span class="px-2 bg-white text-gray-500">Or continue with</span>
+          <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Or continue with</span>
         </div>
       </div>
 
@@ -182,7 +182,7 @@ async function handleForgotPassword() {
         type="button"
         @click="handleGoogleSignIn"
         :disabled="authStore.loading"
-        class="w-full flex justify-center items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full flex justify-center items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -196,11 +196,11 @@ async function handleForgotPassword() {
 
     <!-- Sign Up Link -->
     <div class="mt-6 text-center">
-      <p class="text-sm text-gray-600">
+      <p class="text-sm text-gray-600 dark:text-gray-400">
         Don't have an account?
         <button
           @click="$emit('switch-to-signup')"
-          class="text-blue-600 hover:text-blue-500 font-medium"
+          class="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 font-medium"
           :disabled="authStore.loading"
         >
           Sign up

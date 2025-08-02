@@ -1,10 +1,10 @@
 <template>
-  <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-6 border border-orange-100">
+  <div class="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-xl p-6 border border-orange-100 dark:border-orange-800">
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-bold text-gray-900">🔥 Streak Progress</h3>
+      <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">🔥 Streak Progress</h3>
       <div class="text-right">
-        <div class="text-2xl font-bold text-orange-600">{{ gamificationStore.userStats.currentStreak }}</div>
-        <div class="text-xs text-gray-600">days</div>
+        <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">{{ gamificationStore.userStats.currentStreak }}</div>
+        <div class="text-xs text-gray-600 dark:text-gray-400">days</div>
       </div>
     </div>
 
@@ -40,10 +40,10 @@
     <!-- Progress towards next milestone -->
     <div class="mb-4">
       <div class="flex justify-between items-center mb-2">
-        <span class="text-sm font-medium text-gray-700">Next milestone</span>
-        <span class="text-sm text-gray-600">{{ nextMilestone }} days</span>
+        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Next milestone</span>
+        <span class="text-sm text-gray-600 dark:text-gray-400">{{ nextMilestone }} days</span>
       </div>
-      <div class="w-full bg-gray-200 rounded-full h-2">
+      <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
         <div 
           class="h-2 rounded-full transition-all duration-500 ease-out"
           :class="progressBarClass"
@@ -53,20 +53,20 @@
     </div>
 
     <!-- Stats row -->
-    <div class="grid grid-cols-2 gap-4 pt-4 border-t border-orange-100">
+    <div class="grid grid-cols-2 gap-4 pt-4 border-t border-orange-100 dark:border-orange-800">
       <div class="text-center">
-        <div class="text-xl font-bold text-gray-900">{{ gamificationStore.userStats.longestStreak }}</div>
-        <div class="text-xs text-gray-600">Longest Streak</div>
+        <div class="text-xl font-bold text-gray-900 dark:text-gray-100">{{ gamificationStore.userStats.longestStreak }}</div>
+        <div class="text-xs text-gray-600 dark:text-gray-400">Longest Streak</div>
       </div>
       <div class="text-center">
-        <div class="text-xl font-bold text-gray-900">{{ gamificationStore.userStats.totalEntries }}</div>
-        <div class="text-xs text-gray-600">Total Entries</div>
+        <div class="text-xl font-bold text-gray-900 dark:text-gray-100">{{ gamificationStore.userStats.totalEntries }}</div>
+        <div class="text-xs text-gray-600 dark:text-gray-400">Total Entries</div>
       </div>
     </div>
 
     <!-- Motivational message -->
     <div class="mt-4 text-center">
-      <p class="text-sm text-gray-600 italic">{{ motivationalMessage }}</p>
+      <p class="text-sm text-gray-600 dark:text-gray-400 italic">{{ motivationalMessage }}</p>
     </div>
   </div>
 </template>

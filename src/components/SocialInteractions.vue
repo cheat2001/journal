@@ -3,21 +3,21 @@
     <!-- Detailed Reaction Summary -->
     <div v-if="totalReactions > 0" class="mb-4 sm:mb-6">
       <!-- Reaction Overview with Avatars -->
-      <div class="flex items-center justify-between mb-3 sm:mb-4 p-3 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl">
+      <div class="flex items-center justify-between mb-3 sm:mb-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg sm:rounded-xl">
         <div class="flex items-center space-x-2 sm:space-x-3">
           <div class="flex -space-x-1 sm:-space-x-2">
             <div
               v-for="(count, emoji) in uniqueReactions"
               :key="emoji"
-              class="w-6 h-6 sm:w-8 sm:h-8 bg-white border-2 border-white rounded-full flex items-center justify-center text-sm sm:text-lg shadow-md hover:scale-110 transition-transform duration-200"
+              class="w-6 h-6 sm:w-8 sm:h-8 bg-white dark:bg-gray-600 border-2 border-white dark:border-gray-500 rounded-full flex items-center justify-center text-sm sm:text-lg shadow-md hover:scale-110 transition-transform duration-200"
               :title="`${count} ${getReactionLabel(emoji)}`"
             >
               {{ emoji }}
             </div>
           </div>
           <div class="text-xs sm:text-sm">
-            <p class="font-semibold text-gray-900">{{ totalReactions }} {{ totalReactions === 1 ? 'reaction' : 'reactions' }}</p>
-            <p class="text-gray-600 hidden sm:block">{{ getTopReaction() }}</p>
+            <p class="font-semibold text-gray-900 dark:text-gray-100">{{ totalReactions }} {{ totalReactions === 1 ? 'reaction' : 'reactions' }}</p>
+            <p class="text-gray-600 dark:text-gray-400 hidden sm:block">{{ getTopReaction() }}</p>
           </div>
         </div>
         
@@ -33,15 +33,15 @@
               {{ getAuthorInitials(reactor.userDisplayName) }}
             </div>
           </div>
-          <span class="text-xs text-gray-500 hidden sm:inline">
+          <span class="text-xs text-gray-500 dark:text-gray-400 hidden sm:inline">
             {{ recentReactors.length > 3 ? `+${recentReactors.length - 3} more` : '' }}
           </span>
         </div>
       </div>
 
       <!-- Detailed Reaction Breakdown -->
-      <div v-if="showReactionDetails" class="mb-4 p-4 bg-white border border-gray-200 rounded-xl">
-        <h4 class="font-semibold text-gray-900 mb-3">Who reacted</h4>
+      <div v-if="showReactionDetails" class="mb-4 p-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl">
+        <h4 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">Who reacted</h4>
         <div class="space-y-3">
           <div
             v-for="(reactionGroup, emoji) in groupedReactions"
@@ -50,12 +50,12 @@
           >
             <div class="text-2xl">{{ emoji }}</div>
             <div class="flex-1">
-              <p class="text-sm font-medium text-gray-900 mb-1">{{ getReactionLabel(emoji) }}</p>
+              <p class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">{{ getReactionLabel(emoji) }}</p>
               <div class="flex flex-wrap gap-2">
                 <span
                   v-for="reactor in reactionGroup"
                   :key="reactor.userId"
-                  class="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
+                  class="inline-flex items-center px-2 py-1 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-xs rounded-full"
                 >
                   {{ reactor.userDisplayName }}
                 </span>
@@ -104,7 +104,7 @@
               leave-to-class="transform opacity-0 scale-95"
             >
               <div v-if="showQuickReactionDropdown" 
-                   class="absolute bottom-full left-0 mb-2 bg-white rounded-lg shadow-lg border border-gray-200 p-2 flex space-x-1 z-10">
+                   class="absolute bottom-full left-0 mb-2 bg-white dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 p-2 flex space-x-1 z-10">
                 <button
                   v-for="reactionType in reactionTypes"
                   :key="reactionType.emoji"
@@ -112,8 +112,8 @@
                   :class="[
                     'p-2 rounded-md text-2xl transition-all duration-150 hover:scale-110',
                     hasUserReacted(reactionType.emoji) 
-                      ? 'bg-blue-100 border-2 border-blue-300' 
-                      : 'hover:bg-gray-100'
+                      ? 'bg-blue-100 dark:bg-blue-900/50 border-2 border-blue-300 dark:border-blue-500' 
+                      : 'hover:bg-gray-100 dark:hover:bg-gray-600'
                   ]"
                   :title="reactionType.label"
                 >
@@ -181,13 +181,13 @@
     <!-- Comments Section -->
     <div class="space-y-6">
       <div class="flex items-center justify-between">
-        <h3 class="text-lg font-semibold text-gray-900">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
           Comments ({{ comments.length }})
         </h3>
         <button
           v-if="!showFullComments && comments.length > 3"
           @click="showFullComments = true"
-          class="text-sm text-blue-600 hover:text-blue-700 font-medium"
+          class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
         >
           View all {{ comments.length }} comments
         </button>
@@ -204,12 +204,12 @@
             v-model="newComment"
             placeholder="Write a comment..."
             rows="3"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm text-black"
+            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm text-black dark:text-white bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
             @keydown.ctrl.enter="addComment"
             @keydown.meta.enter="addComment"
           ></textarea>
           <div class="flex items-center justify-between mt-2">
-            <span class="text-xs text-gray-500">
+            <span class="text-xs text-gray-500 dark:text-gray-400">
               Press Ctrl+Enter to post
             </span>
             <button
@@ -225,8 +225,8 @@
       </div>
 
       <!-- Sign in to comment -->
-      <div v-else class="text-center py-8 bg-gray-50 rounded-lg">
-        <p class="text-gray-600 mb-4">Sign in to join the conversation</p>
+      <div v-else class="text-center py-8 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+        <p class="text-gray-600 dark:text-gray-400 mb-4">Sign in to join the conversation</p>
         <router-link
           to="/auth"
           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
@@ -246,12 +246,12 @@
             {{ getAuthorInitials(comment.authorName) }}
           </div>
           <div class="flex-1">
-            <div class="bg-gray-50 rounded-lg px-4 py-3">
+            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg px-4 py-3">
               <div class="flex items-center space-x-2 mb-1">
-                <span class="font-medium text-gray-900 text-sm">{{ comment.authorName }}</span>
-                <span class="text-xs text-gray-500">{{ formatTimeAgo(comment.createdAt) }}</span>
+                <span class="font-medium text-gray-900 dark:text-gray-100 text-sm">{{ comment.authorName }}</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400">{{ formatTimeAgo(comment.createdAt) }}</span>
               </div>
-              <p class="text-gray-800 text-sm leading-relaxed">{{ comment.content }}</p>
+              <p class="text-gray-800 dark:text-gray-200 text-sm leading-relaxed">{{ comment.content }}</p>
             </div>
           </div>
         </div>
@@ -269,21 +269,21 @@
 
       <!-- Empty State -->
       <div v-if="comments.length === 0 && !authStore.isAuthenticated" class="text-center py-8">
-        <div class="text-gray-400 mb-2">
+        <div class="text-gray-400 dark:text-gray-500 mb-2">
           <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
           </svg>
         </div>
-        <p class="text-gray-500 text-sm">No comments yet. Be the first to share your thoughts!</p>
+        <p class="text-gray-500 dark:text-gray-400 text-sm">No comments yet. Be the first to share your thoughts!</p>
       </div>
 
       <div v-else-if="comments.length === 0" class="text-center py-8">
-        <div class="text-gray-400 mb-2">
+        <div class="text-gray-400 dark:text-gray-500 mb-2">
           <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
           </svg>
         </div>
-        <p class="text-gray-500 text-sm">No comments yet. Share your thoughts!</p>
+        <p class="text-gray-500 dark:text-gray-400 text-sm">No comments yet. Share your thoughts!</p>
       </div>
     </div>
   </div>

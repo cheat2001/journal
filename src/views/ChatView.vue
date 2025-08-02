@@ -1,16 +1,16 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-slate-900 dark:to-indigo-950">
     <!-- Chat Header -->
-    <div class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+    <div class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
       <div class="max-w-4xl mx-auto px-4 py-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <!-- Back Button -->
             <button 
               @click="router.back()" 
-              class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
-              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
               </svg>
             </button>
@@ -23,8 +23,8 @@
                 </span>
               </div>
               <div>
-                <h1 class="text-lg font-semibold text-gray-900">{{ otherParticipant.name }}</h1>
-                <p class="text-xs text-gray-500">Online</p>
+                <h1 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ otherParticipant.name }}</h1>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Online</p>
               </div>
             </div>
           </div>
@@ -34,15 +34,15 @@
             <!-- Sound Toggle Button -->
             <button 
               @click="toggleSound"
-              class="p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 relative sound-button"
+              class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 relative sound-button"
               :class="{ 'sound-wave': soundEnabled }"
               :title="soundEnabled ? 'Disable notification sounds' : 'Enable notification sounds'"
             >
-              <svg v-if="soundEnabled" class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <svg v-if="soundEnabled" class="w-5 h-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.816L4.764 14H2a1 1 0 01-1-1V7a1 1 0 011-1h2.764l3.619-2.816a1 1 0 011.617.816zM12.804 8.196a.75.75 0 011.06-.028 4 4 0 010 5.664.75.75 0 11-1.032-1.088 2.5 2.5 0 000-3.536.75.75 0 01-.028-1.06z" clip-rule="evenodd"/>
                 <path d="M14.8 5.61a.75.75 0 011.06-.014 8 8 0 010 11.314.75.75 0 11-1.046-1.074 6.5 6.5 0 000-9.166.75.75 0 01-.014-1.06z"/>
               </svg>
-              <svg v-else class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+              <svg v-else class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 4a1 1 0 00-1.617-.816L4.764 6H2a1 1 0 00-1 1v6a1 1 0 001 1h2.764l3.619 2.816A1 1 0 0010 16V4z"/>
                 <path d="M13.293 7.293a1 1 0 011.414 0L16 8.586l1.293-1.293a1 1 0 111.414 1.414L17.414 10l1.293 1.293a1 1 0 01-1.414 1.414L16 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L14.586 10l-1.293-1.293a1 1 0 010-1.414z"/>
               </svg>
@@ -51,7 +51,7 @@
             <!-- Debug Refresh Button (temporary) -->
             <button 
               @click="forceRefresh"
-              class="p-2 rounded-lg hover:bg-gray-100 transition-colors text-orange-600"
+              class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-orange-600 dark:text-orange-400"
               title="Force refresh messages (debug)"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,8 +59,8 @@
               </svg>
             </button>
             
-            <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/>
               </svg>
             </button>
@@ -80,8 +80,8 @@
           
           <div v-else-if="messages.length === 0" class="text-center py-12">
             <div class="text-6xl mb-4">💬</div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">Start the conversation!</h3>
-            <p class="text-gray-600">Send a message to {{ otherParticipant?.name }} to begin chatting.</p>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Start the conversation!</h3>
+            <p class="text-gray-600 dark:text-gray-400">Send a message to {{ otherParticipant?.name }} to begin chatting.</p>
           </div>
           
           <div v-else>
@@ -101,10 +101,10 @@
                     </span>
                   </div>
                   <div>
-                    <div class="bg-white rounded-2xl rounded-tl-md px-4 py-3 shadow-sm border border-gray-200">
-                      <p class="text-sm text-gray-900 whitespace-pre-wrap break-words">{{ message.content }}</p>
+                    <div class="bg-white dark:bg-gray-700 rounded-2xl rounded-tl-md px-4 py-3 shadow-sm border border-gray-200 dark:border-gray-600">
+                      <p class="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">{{ message.content }}</p>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1 ml-2">{{ formatMessageTime(message.timestamp) }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-2">{{ formatMessageTime(message.timestamp) }}</p>
                   </div>
                 </div>
                 
@@ -114,7 +114,7 @@
                     <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl rounded-tr-md px-4 py-3 shadow-sm">
                       <p class="text-sm text-white whitespace-pre-wrap break-words">{{ message.content }}</p>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1 mr-2 text-right">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 mr-2 text-right">
                       {{ formatMessageTime(message.timestamp) }}
                       <span v-if="message.isRead" class="ml-1">✓✓</span>
                       <span v-else class="ml-1">✓</span>
@@ -127,20 +127,20 @@
         </div>
 
         <!-- Message Input -->
-        <div class="border-t border-gray-200 bg-white px-4 py-4">
+        <div class="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-4">
           <div class="flex items-end space-x-3">
             <div class="flex-1">
               <textarea
                 v-model="newMessage"
                 placeholder="Type your message..."
                 rows="1"
-                class="w-full resize-none border border-gray-300 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm max-h-32 overflow-y-auto text-gray-900 bg-white placeholder-gray-500"
+                class="w-full resize-none border border-gray-300 dark:border-gray-600 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm max-h-32 overflow-y-auto text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
                 @keydown.enter.exact.prevent="sendMessage"
                 @keydown.shift.enter="addNewLine"
                 @input="handleTyping"
                 ref="messageInput"
               ></textarea>
-              <p class="text-xs text-gray-500 mt-1 ml-2">Press Enter to send, Shift+Enter for new line</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 ml-2">Press Enter to send, Shift+Enter for new line</p>
             </div>
             <button
               @click="sendMessage"

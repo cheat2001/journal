@@ -1,11 +1,11 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-slate-900 dark:to-indigo-950">
     <!-- Header -->
-    <div class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+    <div class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
       <div class="max-w-4xl mx-auto px-4 py-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <h1 class="text-2xl font-bold text-gray-900">Messages</h1>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Messages</h1>
             <div v-if="unreadCount > 0" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
               {{ unreadCount }}
             </div>
@@ -13,7 +13,7 @@
           
           <button 
             @click="router.push('/feed')" 
-            class="text-blue-600 hover:text-blue-700 font-medium"
+            class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
           >
             Back to Feed
           </button>
@@ -29,8 +29,8 @@
       
       <div v-else-if="chatRooms.length === 0" class="text-center py-16">
         <div class="text-8xl mb-6">💬</div>
-        <h3 class="text-2xl font-semibold text-gray-900 mb-4">No conversations yet</h3>
-        <p class="text-gray-600 mb-8 max-w-md mx-auto">Start chatting with other users from the community feed. Click "Start Chat" on any journal entry to begin a conversation!</p>
+        <h3 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">No conversations yet</h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">Start chatting with other users from the community feed. Click "Start Chat" on any journal entry to begin a conversation!</p>
         <button 
           @click="router.push('/feed')"
           class="inline-flex items-center px-6 py-3 text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
@@ -48,7 +48,7 @@
           v-for="chatRoom in sortedChatRooms"
           :key="chatRoom.id"
           @click="openChat(chatRoom.id)"
-          class="bg-white rounded-xl shadow-sm border border-gray-200/60 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer group overflow-hidden"
+          class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200/60 dark:border-gray-700/60 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer group overflow-hidden"
         >
           <div class="p-4 sm:p-6">
             <div class="flex items-center space-x-4">
@@ -65,11 +65,11 @@
               <!-- Chat Info -->
               <div class="flex-1 min-w-0">
                 <div class="flex items-center justify-between mb-1">
-                  <h3 class="text-base sm:text-lg font-semibold text-gray-900 truncate group-hover:text-blue-700 transition-colors">
+                  <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 truncate group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
                     {{ getOtherParticipant(chatRoom)?.name }}
                   </h3>
                   <div class="flex items-center space-x-2 ml-2">
-                    <span v-if="chatRoom.lastMessage" class="text-xs sm:text-sm text-gray-500 font-medium">
+                    <span v-if="chatRoom.lastMessage" class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium">
                       {{ formatChatTime(chatRoom.lastMessage.timestamp) }}
                     </span>
                     <div v-if="isUnread(chatRoom)" class="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -78,11 +78,11 @@
                 
                 <!-- Last Message -->
                 <div class="flex items-center justify-between">
-                  <p v-if="chatRoom.lastMessage" class="text-sm text-gray-600 truncate flex-1">
-                    <span v-if="chatRoom.lastMessage.senderId === authStore.user?.uid" class="text-gray-500">You: </span>
+                  <p v-if="chatRoom.lastMessage" class="text-sm text-gray-600 dark:text-gray-300 truncate flex-1">
+                    <span v-if="chatRoom.lastMessage.senderId === authStore.user?.uid" class="text-gray-500 dark:text-gray-400">You: </span>
                     {{ chatRoom.lastMessage.content }}
                   </p>
-                  <p v-else class="text-sm text-gray-500 italic flex-1">
+                  <p v-else class="text-sm text-gray-500 dark:text-gray-400 italic flex-1">
                     No messages yet
                   </p>
                   
@@ -94,7 +94,7 @@
               </div>
               
               <!-- Arrow -->
-              <div class="text-gray-400 group-hover:text-blue-500 transition-colors">
+              <div class="text-gray-400 dark:text-gray-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>

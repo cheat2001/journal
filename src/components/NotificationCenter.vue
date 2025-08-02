@@ -5,8 +5,8 @@
       @click="toggleDropdown"
       :class="[
         'relative p-2 rounded-lg transition-all duration-200',
-        'text-gray-600 hover:text-gray-900',
-        'hover:bg-gray-100',
+        'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100',
+        'hover:bg-gray-100 dark:hover:bg-gray-800',
         'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
         unreadCount > 0 ? 'animate-pulse' : ''
       ]"
@@ -43,26 +43,26 @@
     >
       <div
         v-if="isOpen"
-        class="absolute right-0 mt-2 w-72 sm:w-80 md:w-96 max-w-[calc(100vw-1rem)] bg-white rounded-xl shadow-xl ring-1 ring-gray-200 focus:outline-none z-50 sm:right-0 right-0"
+        class="absolute right-0 mt-2 w-72 sm:w-80 md:w-96 max-w-[calc(100vw-1rem)] bg-white dark:bg-gray-800 rounded-xl shadow-xl ring-1 ring-gray-200 dark:ring-gray-700 focus:outline-none z-50"
         @click.stop
       >
         <!-- Header -->
-        <div class="px-3 sm:px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-          <h3 class="text-base sm:text-lg font-semibold text-gray-900">
+        <div class="px-3 sm:px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+          <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">
             Notifications
           </h3>
           <div class="flex items-center space-x-1 sm:space-x-2">
             <button
               v-if="unreadCount > 0"
               @click="handleMarkAllRead"
-              class="text-xs text-blue-600 hover:text-blue-500 font-medium px-2 py-1 rounded hover:bg-blue-50 transition-colors"
+              class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 font-medium px-2 py-1 rounded hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
             >
               <span class="hidden sm:inline">Mark all read</span>
               <span class="sm:hidden">Mark read</span>
             </button>
             <button
               @click="closeDropdown"
-              class="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-100 transition-colors"
+              class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <XMarkIcon class="w-4 h-4" />
             </button>
@@ -74,29 +74,29 @@
           <!-- Loading State -->
           <div v-if="loading" class="p-4 sm:p-6 text-center">
             <div class="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-            <p class="text-xs sm:text-sm text-gray-500">Loading...</p>
+            <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Loading...</p>
           </div>
 
           <!-- Empty State -->
           <div v-else-if="recentNotifications.length === 0" class="p-4 sm:p-6 text-center">
-            <BellSlashIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-300 mb-2 sm:mb-3" />
-            <h3 class="text-xs sm:text-sm font-medium text-gray-900 mb-1">
+            <BellSlashIcon class="mx-auto h-8 w-8 sm:h-12 sm:w-12 text-gray-300 dark:text-gray-600 mb-2 sm:mb-3" />
+            <h3 class="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">
               No notifications yet
             </h3>
-            <p class="text-xs text-gray-500">
+            <p class="text-xs text-gray-500 dark:text-gray-400">
               When people interact with your entries, you'll see notifications here
             </p>
           </div>
 
           <!-- Notification Items -->
-          <div v-else class="divide-y divide-gray-100">
+          <div v-else class="divide-y divide-gray-100 dark:divide-gray-700">
             <div
               v-for="notification in recentNotifications"
               :key="notification.id"
               @click="handleNotificationClick(notification)"
               :class="[
-                'px-3 sm:px-4 py-3 sm:py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150 relative',
-                !notification.isRead ? 'bg-blue-50' : ''
+                'px-3 sm:px-4 py-3 sm:py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-150 relative',
+                !notification.isRead ? 'bg-blue-50 dark:bg-blue-900/20' : ''
               ]"
             >
                 <!-- Unread indicator -->
@@ -118,11 +118,11 @@
                   <div class="flex-1 min-w-0">
                     <!-- Header with title and time -->
                     <div class="flex items-start justify-between mb-1">
-                      <p class="text-xs sm:text-sm font-semibold text-gray-900 pr-1 sm:pr-2 leading-tight">
+                      <p class="text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-100 pr-1 sm:pr-2 leading-tight">
                         {{ notification.title }}
                       </p>
                       <div class="flex items-center space-x-1 flex-shrink-0">
-                        <span class="text-xs text-gray-500 whitespace-nowrap">
+                        <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                           {{ formatTime(notification.createdAt) }}
                         </span>
                         <div
@@ -133,7 +133,7 @@
                     </div>
                     
                     <!-- Message -->
-                    <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                    <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                       {{ notification.message }}
                     </p>
                     
@@ -144,7 +144,7 @@
                           {{ notification.data.fromUserInitials }}
                         </span>
                       </div>
-                      <span class="text-xs sm:text-sm text-gray-500 truncate">
+                      <span class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
                         {{ notification.data.fromUserName }}
                       </span>
                       
@@ -159,10 +159,10 @@
           </div>
 
           <!-- View All Link -->
-          <div v-if="notifications.length > recentNotifications.length" class="p-2 sm:p-3 border-t border-gray-200 bg-gray-50">
+          <div v-if="notifications.length > recentNotifications.length" class="p-2 sm:p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
             <button 
               @click="viewAllNotifications"
-              class="w-full text-xs sm:text-sm text-blue-600 hover:text-blue-500 font-medium py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors"
+              class="w-full text-xs sm:text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 font-medium py-2 px-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
             >
               <span class="hidden sm:inline">View all {{ notifications.length }} notifications</span>
               <span class="sm:hidden">View all ({{ notifications.length }})</span>

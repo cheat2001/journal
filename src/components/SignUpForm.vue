@@ -90,14 +90,14 @@ async function handleGoogleSignUp() {
   <div class="w-full">
     <!-- Header -->
     <div class="text-center mb-8">
-      <h2 class="text-2xl font-bold text-gray-900 mb-2">Create your account</h2>
-      <p class="text-gray-600">Start your journaling journey today</p>
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Create your account</h2>
+      <p class="text-gray-600 dark:text-gray-400">Start your journaling journey today</p>
     </div>
 
     <form @submit.prevent="handleSignUp" class="space-y-6">
       <!-- Display Name Field -->
       <div>
-        <label for="signup-displayName" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="signup-displayName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Full Name
         </label>
         <input
@@ -112,12 +112,12 @@ async function handleGoogleSignUp() {
           placeholder="Enter your full name"
           @blur="showValidation = true"
         />
-        <p v-if="displayNameError" class="mt-1 text-sm text-red-600">{{ displayNameError }}</p>
+        <p v-if="displayNameError" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ displayNameError }}</p>
       </div>
 
       <!-- Email Field -->
       <div>
-        <label for="signup-email" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="signup-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Email address
         </label>
         <input
@@ -132,12 +132,12 @@ async function handleGoogleSignUp() {
           placeholder="Enter your email address"
           @blur="showValidation = true"
         />
-        <p v-if="emailError" class="mt-1 text-sm text-red-600">{{ emailError }}</p>
+        <p v-if="emailError" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ emailError }}</p>
       </div>
 
       <!-- Password Field -->
       <div>
-        <label for="signup-password" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="signup-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Password
         </label>
         <input
@@ -152,15 +152,15 @@ async function handleGoogleSignUp() {
           placeholder="Create a password (min. 6 characters)"
           @blur="showValidation = true"
         />
-        <p class="mt-1 text-xs text-gray-500">
+        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
           Password must be at least 6 characters long
         </p>
-        <p v-if="passwordError" class="mt-1 text-sm text-red-600">{{ passwordError }}</p>
+        <p v-if="passwordError" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ passwordError }}</p>
       </div>
 
       <!-- Confirm Password Field -->
       <div>
-        <label for="signup-confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
+        <label for="signup-confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Confirm Password
         </label>
         <input
@@ -175,7 +175,7 @@ async function handleGoogleSignUp() {
           placeholder="Confirm your password"
           @blur="showValidation = true"
         />
-        <p v-if="confirmPasswordError" class="mt-1 text-sm text-red-600">{{ confirmPasswordError }}</p>
+        <p v-if="confirmPasswordError" class="mt-1 text-sm text-red-600 dark:text-red-400">{{ confirmPasswordError }}</p>
       </div>
 
       <!-- Terms and Privacy -->
@@ -185,21 +185,21 @@ async function handleGoogleSignUp() {
           v-model="form.acceptTerms"
           type="checkbox"
           required
-          class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+          class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded mt-1 bg-white dark:bg-gray-700"
           :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-500': termsError }"
           @change="showValidation = true"
         />
-        <label for="terms" class="ml-2 block text-sm text-gray-900">
+        <label for="terms" class="ml-2 block text-sm text-gray-900 dark:text-gray-100">
           I agree to the 
-          <a href="#" class="text-blue-600 hover:text-blue-500">Terms of Service</a>
+          <a href="#" class="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">Terms of Service</a>
           and 
-          <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a>
+          <a href="#" class="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">Privacy Policy</a>
         </label>
       </div>
-      <p v-if="termsError" class="text-sm text-red-600">{{ termsError }}</p>
+      <p v-if="termsError" class="text-sm text-red-600 dark:text-red-400">{{ termsError }}</p>
 
       <!-- Error Message -->
-      <div v-if="authStore.error" class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+      <div v-if="authStore.error" class="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
         {{ authStore.error }}
       </div>
 
@@ -217,10 +217,10 @@ async function handleGoogleSignUp() {
       <!-- Divider -->
       <div class="relative">
         <div class="absolute inset-0 flex items-center">
-          <div class="w-full border-t border-gray-300"></div>
+          <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
         </div>
         <div class="relative flex justify-center text-sm">
-          <span class="px-2 bg-white text-gray-500">Or continue with</span>
+          <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Or continue with</span>
         </div>
       </div>
 
@@ -229,7 +229,7 @@ async function handleGoogleSignUp() {
         type="button"
         @click="handleGoogleSignUp"
         :disabled="authStore.loading"
-        class="w-full flex justify-center items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full flex justify-center items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -243,11 +243,11 @@ async function handleGoogleSignUp() {
 
     <!-- Sign In Link -->
     <div class="mt-6 text-center">
-      <p class="text-sm text-gray-600">
+      <p class="text-sm text-gray-600 dark:text-gray-400">
         Already have an account?
         <button
           @click="$emit('switch-to-signin')"
-          class="text-blue-600 hover:text-blue-500 font-medium"
+          class="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 font-medium"
           :disabled="authStore.loading"
         >
           Sign in

@@ -1,20 +1,20 @@
 <template>
-  <div class="bg-white/95 backdrop-blur-sm border border-gray-200/60 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 group hover:scale-[1.02] hover:border-blue-200">
+  <div class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border border-gray-200/60 dark:border-gray-700/60 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 group hover:scale-[1.02] hover:border-blue-200 dark:hover:border-blue-600">
     <div class="flex justify-between items-start mb-6">
       <div class="flex-1">
         <div class="flex items-center gap-3 mb-2">
-          <div class="w-12 h-12 bg-gradient-to-br from-blue-100 via-purple-50 to-indigo-100 rounded-xl flex items-center justify-center shadow-sm">
+          <div class="w-12 h-12 bg-gradient-to-br from-blue-100 via-purple-50 to-indigo-100 dark:from-blue-900/50 dark:via-purple-900/30 dark:to-indigo-900/50 rounded-xl flex items-center justify-center shadow-sm">
             <span class="text-2xl">{{ getEmotionEmoji(entry.emotion) }}</span>
           </div>
           <div>
-            <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-900 transition-colors">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-900 dark:group-hover:text-blue-300 transition-colors">
               {{ formatDate(entry.date) }}
             </h3>
             <div class="flex items-center gap-2">
-              <span class="text-sm text-gray-600 capitalize font-medium bg-gradient-to-r from-gray-100 to-gray-50 px-3 py-1 rounded-full border border-gray-200">
+              <span class="text-sm text-gray-600 dark:text-gray-400 capitalize font-medium bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-600 px-3 py-1 rounded-full border border-gray-200 dark:border-gray-600">
                 {{ entry.emotion }}
               </span>
-              <span class="text-xs text-gray-400">
+              <span class="text-xs text-gray-400 dark:text-gray-500">
                 {{ formatTime(entry.createdAt) }}
               </span>
             </div>
@@ -25,14 +25,14 @@
       <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
         <button
           @click="$emit('edit', entry)"
-          class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:scale-110"
+          class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200 hover:scale-110"
           title="Edit entry"
         >
           <PencilIcon class="w-5 h-5" />
         </button>
         <button
           @click="entry.id && $emit('delete', entry.id)"
-          class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"
+          class="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all duration-200 hover:scale-110"
           title="Delete entry"
           :disabled="!entry.id"
         >
@@ -43,43 +43,43 @@
 
     <div class="space-y-6">
       <!-- Gratitude -->
-      <div v-if="entry.gratitude" class="bg-gradient-to-r from-pink-50 to-rose-50 border border-pink-100 rounded-xl p-4">
-        <h4 class="text-sm font-bold text-gray-800 mb-2 flex items-center">
-          <div class="w-6 h-6 bg-pink-100 rounded-lg flex items-center justify-center mr-2">
-            <HeartIcon class="w-4 h-4 text-pink-600" />
+      <div v-if="entry.gratitude" class="bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 border border-pink-100 dark:border-pink-800 rounded-xl p-4">
+        <h4 class="text-sm font-bold text-gray-800 dark:text-gray-200 mb-2 flex items-center">
+          <div class="w-6 h-6 bg-pink-100 dark:bg-pink-800 rounded-lg flex items-center justify-center mr-2">
+            <HeartIcon class="w-4 h-4 text-pink-600 dark:text-pink-400" />
           </div>
           Grateful for
         </h4>
-        <p class="text-gray-900 leading-relaxed">{{ entry.gratitude }}</p>
+        <p class="text-gray-900 dark:text-gray-100 leading-relaxed">{{ entry.gratitude }}</p>
       </div>
 
       <!-- Challenges -->
-      <div v-if="entry.challenges" class="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-100 rounded-xl p-4">
-        <h4 class="text-sm font-bold text-gray-800 mb-2 flex items-center">
-          <div class="w-6 h-6 bg-orange-100 rounded-lg flex items-center justify-center mr-2">
-            <ExclamationTriangleIcon class="w-4 h-4 text-orange-600" />
+      <div v-if="entry.challenges" class="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 border border-orange-100 dark:border-orange-800 rounded-xl p-4">
+        <h4 class="text-sm font-bold text-gray-800 dark:text-gray-200 mb-2 flex items-center">
+          <div class="w-6 h-6 bg-orange-100 dark:bg-orange-800 rounded-lg flex items-center justify-center mr-2">
+            <ExclamationTriangleIcon class="w-4 h-4 text-orange-600 dark:text-orange-400" />
           </div>
           Challenges
         </h4>
-        <p class="text-gray-900 leading-relaxed">{{ entry.challenges }}</p>
+        <p class="text-gray-900 dark:text-gray-100 leading-relaxed">{{ entry.challenges }}</p>
       </div>
 
       <!-- Learning -->
-      <div v-if="entry.learning" class="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-100 rounded-xl p-4">
-        <h4 class="text-sm font-bold text-gray-800 mb-2 flex items-center">
-          <div class="w-6 h-6 bg-yellow-100 rounded-lg flex items-center justify-center mr-2">
-            <LightBulbIcon class="w-4 h-4 text-yellow-600" />
+      <div v-if="entry.learning" class="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border border-yellow-100 dark:border-yellow-800 rounded-xl p-4">
+        <h4 class="text-sm font-bold text-gray-800 dark:text-gray-200 mb-2 flex items-center">
+          <div class="w-6 h-6 bg-yellow-100 dark:bg-yellow-800 rounded-lg flex items-center justify-center mr-2">
+            <LightBulbIcon class="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
           </div>
           Learning
         </h4>
-        <p class="text-gray-900 leading-relaxed">{{ entry.learning }}</p>
+        <p class="text-gray-900 dark:text-gray-100 leading-relaxed">{{ entry.learning }}</p>
       </div>
     </div>
 
-    <div class="mt-6 pt-4 border-t border-gray-100">
-      <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+    <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+      <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3">
         <span>Created {{ formatDateTime(entry.createdAt) }}</span>
-        <span v-if="entry.updatedAt && entry.updatedAt.getTime() !== entry.createdAt.getTime()" class="text-blue-600">
+        <span v-if="entry.updatedAt && entry.updatedAt.getTime() !== entry.createdAt.getTime()" class="text-blue-600 dark:text-blue-400">
           Updated {{ formatDateTime(entry.updatedAt) }}
         </span>
       </div>
@@ -88,7 +88,7 @@
       <div v-if="entry.isPublic" class="space-y-3">
         <!-- Social Stats -->
         <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4 text-sm text-gray-500">
+          <div class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
             <div class="flex items-center space-x-1">
               <HeartIcon class="w-4 h-4" />
               <span>{{ getTotalReactions(entry) }}</span>

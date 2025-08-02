@@ -97,15 +97,15 @@
 
 /* Enhanced Modern Form Styles */
 .form-input {
-  @apply w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/90 backdrop-blur-sm shadow-sm text-black hover:border-gray-400;
+  @apply w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200 bg-white/90 dark:bg-gray-700/90 backdrop-blur-sm shadow-sm text-black dark:text-white hover:border-gray-400 dark:hover:border-gray-500;
 }
 
 .form-textarea {
-  @apply w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/90 backdrop-blur-sm shadow-sm resize-none text-black hover:border-gray-400;
+  @apply w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200 bg-white/90 dark:bg-gray-700/90 backdrop-blur-sm shadow-sm resize-none text-black dark:text-white hover:border-gray-400 dark:hover:border-gray-500;
 }
 
 .form-select {
-  @apply w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/90 backdrop-blur-sm shadow-sm hover:border-gray-400;
+  @apply w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200 bg-white/90 dark:bg-gray-700/90 backdrop-blur-sm shadow-sm hover:border-gray-400 dark:hover:border-gray-500;
 }
 
 /* Enhanced Modern Card Styles */
