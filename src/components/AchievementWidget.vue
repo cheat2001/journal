@@ -39,7 +39,7 @@
         >
           <span class="text-lg">{{ badge.icon }}</span>
           <div>
-            <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ badge.name }}</div>
+            <div class="text-sm font-medium text-gray-900 dark:text-gray-600">{{ badge.name }}</div>
             <div class="text-xs text-gray-600 dark:text-gray-400">+{{ badge.xpReward }} XP</div>
           </div>
         </div>

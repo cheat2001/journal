@@ -122,6 +122,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useChatStore } from '@/stores/chat'
 import { notificationSound } from '@/utils/notificationSound'
 import Toast from '@/components/Toast.vue'
+import type { ChatRoom } from '@/types/chat'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -139,11 +140,11 @@ const unreadCount = computed(() => chatStore.unreadChatsCount)
 const loading = computed(() => chatStore.loading)
 
 // Methods
-function getOtherParticipant(chatRoom: any) {
+function getOtherParticipant(chatRoom: ChatRoom) {
   return chatStore.getOtherParticipant(chatRoom)
 }
 
-function isUnread(chatRoom: any) {
+function isUnread(chatRoom: ChatRoom) {
   return chatRoom.lastMessage && 
          chatRoom.lastMessage.senderId !== authStore.user?.uid && 
          !chatRoom.lastMessage.isRead
