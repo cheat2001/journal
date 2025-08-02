@@ -345,7 +345,7 @@ export const useNotificationStore = defineStore('notification', () => {
 
     // Notify all comment participants
     for (const participantId of participants) {
-      const participantName = participantDetails.get(participantId)
+
       await createNotification({
         userId: participantId,
         type: 'comment',
@@ -515,7 +515,7 @@ export const useNotificationStore = defineStore('notification', () => {
   }
 
   // Toast notifications
-  function showToast(p0: string, p1: string, p2: number, toast: Omit<ToastNotification, 'id'>) {
+  function showToast(toast: Omit<ToastNotification, 'id'>) {
     const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     const newToast: ToastNotification = {
       id,
